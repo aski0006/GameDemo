@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 namespace AsakiFramework
@@ -63,6 +64,18 @@ namespace AsakiFramework
             }
         }
 
+        protected virtual void Awake()
+        {
+            if (_instance == null)
+            {
+                _instance = this as T;
+                DontDestroyOnLoad(gameObject);
+            }
+            else if (_instance != this)
+            {
+                Destroy(gameObject);
+            }
+        }
         protected virtual void OnDestroy()
         {
             _applicationIsQuitting = true;
