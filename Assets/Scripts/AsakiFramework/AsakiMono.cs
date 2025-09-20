@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using UnityEngine;
 using Object = UnityEngine.Object;
 
@@ -135,6 +136,88 @@ namespace AsakiFramework
         {
             if (cache == null) cache = GetComponent<T>();
             return cache;
+        }
+
+        #endregion
+        
+        #region 常用协程快捷方法
+
+        /// <summary>
+        /// 延迟指定秒数后执行
+        /// </summary>
+        protected Coroutine DelayTime(float seconds, Action action)
+        {
+            return CoroutineUtility.Delay(seconds, action);
+        }
+
+        /// <summary>
+        /// 下一帧执行
+        /// </summary>
+        protected Coroutine RunNextFrame(Action action)
+        {
+            return CoroutineUtility.DelayOneFrame(action);
+        }
+
+        /// <summary>
+        /// 延迟指定帧数后执行
+        /// </summary>
+        protected Coroutine DelayFrames(int frames, Action action)
+        {
+            return CoroutineUtility.DelayFrames(frames, action);
+        }
+
+        /// <summary>
+        /// 条件满足后执行
+        /// </summary>
+        protected Coroutine DelayUntil(Func<bool> condition, Action action, float checkInterval = 0.1f)
+        {
+            return CoroutineUtility.DelayUntil(condition, action, checkInterval);
+        }
+
+        /// <summary>
+        /// 条件为 false 期间一直等待，直到条件变为 true 后执行
+        /// </summary>
+        protected Coroutine DelayWhile(Func<bool> condition, Action action, float checkInterval = 0.1f)
+        {
+            return CoroutineUtility.DelayWhile(condition, action, checkInterval);
+        }
+
+        /// <summary>
+        /// 循环执行 count 次，每次间隔 interval 秒
+        /// </summary>
+        protected Coroutine Loop(int count, float interval, Action<int> action)
+        {
+            return CoroutineUtility.StartCoroutine(_Loop(count, interval, action));
+        }
+
+        /// <summary>
+        /// 无限循环，每次间隔 interval 秒，直到手动 StopCoroutine
+        /// </summary>
+        protected Coroutine LoopForever(float interval, Action action)
+        {
+            return CoroutineUtility.RepeatForever(action, interval);
+        }
+
+        /// <summary>
+        /// 持续执行 action(elapsed) 指定秒数，每帧调用
+        /// </summary>
+        protected Coroutine ExecuteForDuration(float duration, Action<float> action)
+        {
+            return CoroutineUtility.ExecuteForDuration(action, duration);
+        }
+
+/* 内部实现：带索引的 Loop */
+        private IEnumerator _Loop(int count, float interval, Action<int> action)
+        {
+            for (int i = 0; i < count; i++)
+            {
+                action?.Invoke(i);
+                if (i < count - 1)
+                {
+                    if (interval > 0) yield return new WaitForSeconds(interval);
+                    else yield return null;
+                }
+            }
         }
 
         #endregion
