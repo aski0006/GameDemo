@@ -6,7 +6,7 @@ using Model;
 using System;
 using UnityEngine;
 
-namespace Gameplay.Services
+namespace Gameplay.Creator
 {
     public class CardViewCreator : AsakiMono
     {
@@ -17,7 +17,7 @@ namespace Gameplay.Services
             ObjectPool.Create(poolConfig.Prefab, poolConfig.InitialCapacity, poolConfig.MaxCapacity, poolConfig.PoolName);
         }
 
-        public CardViewer CreateCardView(CardModel card, Vector3 position, Quaternion rotation, Transform parent = null)
+        public CardViewer CreateCardView(Card card, Vector3 position, Quaternion rotation, Transform parent = null)
         {
             if (parent == null) parent = transform;
             GameObject cardViewObj = ObjectPool.Get(poolConfig.Prefab, position, rotation, parent);

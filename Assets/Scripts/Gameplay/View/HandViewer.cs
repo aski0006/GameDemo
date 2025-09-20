@@ -1,9 +1,11 @@
 ﻿using AsakiFramework;
 using DG.Tweening;
 using Gameplay.System;
+using Model;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.Splines;
 
@@ -17,35 +19,31 @@ namespace Gameplay.View
         [Header("卡牌移动动画参数"), SerializeField] private float cardMoveDuration = 0.25f;
         [Header("卡牌旋转动画参数"), SerializeField] private float cardRotateDuration = 0.25f;
         private readonly List<CardViewer> cards = new();
-
-        #region 事件
-
-        public struct AddCardViewToHandViewEvent
+        
+        public CardViewer GetCardViewByCard(Card card) => cards.Where(cv => cv.Card == card).FirstOrDefault();
+        public void AddCardViewToHandView(CardViewer cardView)
         {
-            public CardViewer cardView;
+            if (cardView == null) return;
+            CoroutineUtility.StartCoroutine(AddCardViewToHandViewCoroutine(cardView));
         }
-
-        #endregion
-
-        private void OnEnable()
+        public void RemoveCardViewFromHandView(CardViewer cardViewer)
         {
-            EventBus.Instance.Subscribe<AddCardViewToHandViewEvent>(AddCardViewToHandViewEventHandler);
+            if (cardViewer == null) return;
+            CoroutineUtility.StartCoroutine(RemoveCardViewFromHandViewCoroutine(cardViewer));
         }
-
-        private void OnDisable()
-        {
-            EventBus.Instance?.Unsubscribe<AddCardViewToHandViewEvent>(AddCardViewToHandViewEventHandler);
-        }
-
-        public IEnumerator AddCardViewToHandView(CardViewer cardView)
+        private IEnumerator AddCardViewToHandViewCoroutine(CardViewer cardView)
         {
             cards.Add(cardView);
             yield return UpdateCardViewPosition(0.15f);
         }
 
-        private void AddCardViewToHandViewEventHandler(AddCardViewToHandViewEvent e)
-            => StartCoroutine(AddCardViewToHandView(e.cardView));
-
+        private IEnumerator RemoveCardViewFromHandViewCoroutine(CardViewer cardViewer)
+        {
+            if (cardViewer == null) yield break;
+            cards.Remove(cardViewer);
+            yield return UpdateCardViewPosition(0.15f);
+        }
+        
         private IEnumerator UpdateCardViewPosition(float duration)
         {
             if (cards.Count == 0) yield break; // 没有卡牌，直接返回

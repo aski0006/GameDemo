@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace Model
 {
-    public class CardModel
+    public class Card
     {
         private CardData cardData;
         public string cardName => cardData.CardName ?? "UnKnown";
@@ -12,7 +12,7 @@ namespace Model
         public Sprite cardSprite => cardData.CardSprite;
         // TODO : 后续可拓展其他卡牌属性
 
-        public CardModel(CardData data)
+        public Card(CardData data)
         {
             cardData = data;
         }

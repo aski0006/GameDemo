@@ -32,10 +32,18 @@ namespace AsakiFramework
         #region 订阅管理（带去重 + 缓存包装）
         public void SubscribePre<T>(Action<T> callback) where T : GameAction => AddUnique<T>(callback, _preSubs, _preSet);
         public void SubscribePost<T>(Action<T> callback) where T : GameAction => AddUnique<T>(callback, _postSubs, _postSet);
+        public void UnsubscribePre<T>(Action<T> callback) where T : GameAction => RemoveUnique<T>(callback, _preSubs, _preSet);
+        public void UnsubscribePost<T>(Action<T> callback) where T : GameAction => RemoveUnique<T>(callback, _postSubs, _postSet);
+
+        
         public void AttachPerformer<T>(Func<T, IEnumerator> performer) where T : GameAction
         {
             Func<GameAction, IEnumerator> wrapped = a => performer((T)a);
             _perfSubs[typeof(T)] = wrapped;
+        }
+        public void DetachPerformer<T>() where T : GameAction
+        {
+            _perfSubs.Remove(typeof(T));
         }
         public void ClearAll()
         {
@@ -56,6 +64,19 @@ namespace AsakiFramework
             }
             Action<GameAction> wrapped = a => cb((T)a);
             if (set[t].Add(wrapped)) list.Add(wrapped);
+        }
+        
+        private void RemoveUnique<T>(Action<T> cb,
+            Dictionary<Type, List<Action<GameAction>>> dic,
+            Dictionary<Type, HashSet<Action<GameAction>>> set) where T : GameAction
+        {
+            var t = typeof(T);
+            if (!dic.TryGetValue(t, out var list)) return;
+
+            // 创建与 Add 时完全相同的包装委托
+            Action<GameAction> wrapped = a => cb((T)a);
+
+            if (set[t].Remove(wrapped)) list.Remove(wrapped);
         }
         #endregion
 

@@ -28,9 +28,9 @@ namespace Gameplay.View
             HasNotNullComponent(cardCostText);
             cardViewHoverSystem = GetOrAddComponent<CardViewHoverSystem>(FindComponentMode.Scene);
         }
-        public CardModel Card { get; private set; }
+        public Card Card { get; private set; }
         // 视图初始化
-        public void Setup(CardModel model)
+        public void Setup(Card model)
         {
             Card = model;
             cardRenderer.sprite = model.cardSprite;
