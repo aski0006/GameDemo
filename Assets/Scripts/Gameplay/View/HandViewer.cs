@@ -1,5 +1,7 @@
 ﻿using AsakiFramework;
 using DG.Tweening;
+using Gameplay.System;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -16,11 +18,33 @@ namespace Gameplay.View
         [Header("卡牌旋转动画参数"), SerializeField] private float cardRotateDuration = 0.25f;
         private readonly List<CardViewer> cards = new();
 
+        #region 事件
+
+        public struct AddCardViewToHandViewEvent
+        {
+            public CardViewer cardView;
+        }
+
+        #endregion
+
+        private void OnEnable()
+        {
+            EventBus.Instance.Subscribe<AddCardViewToHandViewEvent>(AddCardViewToHandViewEventHandler);
+        }
+
+        private void OnDisable()
+        {
+            EventBus.Instance?.Unsubscribe<AddCardViewToHandViewEvent>(AddCardViewToHandViewEventHandler);
+        }
+
         public IEnumerator AddCardViewToHandView(CardViewer cardView)
         {
             cards.Add(cardView);
             yield return UpdateCardViewPosition(0.15f);
         }
+
+        private void AddCardViewToHandViewEventHandler(AddCardViewToHandViewEvent e)
+            => StartCoroutine(AddCardViewToHandView(e.cardView));
 
         private IEnumerator UpdateCardViewPosition(float duration)
         {
@@ -41,9 +65,10 @@ namespace Gameplay.View
                 cards[i].transform.DOMove(
                     splinePosition + transform.position + 0.01f * i * Vector3.back,
                     cardMoveDuration);
+
                 cards[i].transform.DORotate(rotation.eulerAngles, cardRotateDuration);
-                yield return new WaitForSeconds(duration);
             }
+            yield return new WaitForSeconds(Mathf.Max(cardMoveDuration, cardRotateDuration));
         }
     }
 }

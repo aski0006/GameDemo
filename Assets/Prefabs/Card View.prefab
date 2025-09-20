@@ -560,10 +560,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   isVerbose: 0
+  wrapper: {fileID: 3333035502973073009}
   cardRenderer: {fileID: 6490929098178747084}
   cardNameText: {fileID: 2707856978746723284}
   cardDescriptionText: {fileID: 8253803897398332751}
   cardCostText: {fileID: 5037243673020046472}
+  cardViewHoverSystem: {fileID: 0}
 --- !u!1 &5771307367696499088
 GameObject:
   m_ObjectHideFlags: 0

@@ -2,6 +2,7 @@
 using AsakiFramework.ObjectPool;
 using DG.Tweening;
 using Gameplay.View;
+using Model;
 using System;
 using UnityEngine;
 
@@ -16,7 +17,7 @@ namespace Gameplay.Services
             ObjectPool.Create(poolConfig.Prefab, poolConfig.InitialCapacity, poolConfig.MaxCapacity, poolConfig.PoolName);
         }
 
-        public CardViewer CreateCardView(Vector3 position, Quaternion rotation, Transform parent = null)
+        public CardViewer CreateCardView(CardModel card, Vector3 position, Quaternion rotation, Transform parent = null)
         {
             if (parent == null) parent = transform;
             GameObject cardViewObj = ObjectPool.Get(poolConfig.Prefab, position, rotation, parent);
@@ -33,6 +34,7 @@ namespace Gameplay.Services
             }
             cardViewObj.transform.localScale = Vector3.zero;
             cardViewObj.transform.DOScale(Vector3.one, 0.15f);
+            cardView.Setup(card);
             return cardView;
         }
     }
