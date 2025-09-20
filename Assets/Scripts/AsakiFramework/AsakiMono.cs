@@ -221,6 +221,34 @@ namespace AsakiFramework
         }
 
         #endregion
+        
+        #region 线程安全锁封装
+
+        /// <summary>
+        /// 使用静态锁执行线程安全操作（适合保护全局单例）
+        /// </summary>
+        protected void LockStatic(Action action, int timeoutMillis = -1)
+        {
+            AsakiLock.LockStatic(action, timeoutMillis);
+        }
+
+        /// <summary>
+        /// 使用当前实例作为锁对象执行线程安全操作（适合保护当前组件状态）
+        /// </summary>
+        protected void Lock(Action action, int timeoutMillis = -1)
+        {
+            AsakiLock.Lock(this, action, timeoutMillis);
+        }
+
+        /// <summary>
+        /// 使用指定锁对象执行线程安全操作
+        /// </summary>
+        protected void Lock(object lockObj, Action action, int timeoutMillis = -1)
+        {
+            AsakiLock.Lock(lockObj, action, timeoutMillis);
+        }
+
+        #endregion
 
     }
 

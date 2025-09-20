@@ -1,6 +1,8 @@
 ﻿using AsakiFramework;
 using AsakiFramework.ObjectPool;
+using Gameplay.GA;
 using Gameplay.System;
+using Gameplay.Utility;
 using Model;
 using System;
 using TMPro;
@@ -19,7 +21,13 @@ namespace Gameplay.View
         [Header("卡牌描述文本组件"), SerializeField] TMP_Text cardDescriptionText;
         [Header("卡牌费用文本组件"), SerializeField] TMP_Text cardCostText;
         [Space]
-        [Header("卡牌悬停交互组件"), SerializeField] private CardViewHoverSystem cardViewHoverSystem;
+        [Header("卡牌交互层"), SerializeField] private LayerMask interactionLayerMask;
+        private CardViewHoverSystem cardViewHoverSystem;
+        private InteractionSystem interactionSystem;
+
+        //---------------------------------------------------------------
+        private Vector3 dragStartPos;
+        private Quaternion dragStartRot;
         private void Awake()
         {
             HasNotNullComponent(cardRenderer);
@@ -27,6 +35,7 @@ namespace Gameplay.View
             HasNotNullComponent(cardDescriptionText);
             HasNotNullComponent(cardCostText);
             cardViewHoverSystem = GetOrAddComponent<CardViewHoverSystem>(FindComponentMode.Scene);
+            interactionSystem = GetOrAddComponent<InteractionSystem>(FindComponentMode.Scene);
         }
         public Card Card { get; private set; }
         // 视图初始化
@@ -43,18 +52,61 @@ namespace Gameplay.View
 
         private void OnMouseEnter()
         {
+            if (interactionSystem.PlayerCanHover() == false) return;
             wrapper.SetActive(false);
             cardViewHoverSystem.ShowHoverCardView(Card, transform.position);
         }
 
         private void OnMouseExit()
         {
+            if (interactionSystem.PlayerCanHover() == false) return;
             wrapper.SetActive(true);
             cardViewHoverSystem.HideHoverCardView();
         }
 
+        private void OnMouseDown()
+        {
+            if (interactionSystem.PlayerCanInteract() == false) return;
+            Lock(interactionSystem, () => { interactionSystem.PLayerIsDragging = true; });
+            cardViewHoverSystem.HideHoverCardView();
+            wrapper.SetActive(true);
+            dragStartPos = transform.position;
+            dragStartRot = transform.rotation;
+            transform.rotation = Quaternion.Euler(0, 0, 0);
+            transform.position = MouseUitility.GetMouseWorldPositionInWorldSpace(-1);
+        }
+
+        private void OnMouseDrag()
+        {
+            if (interactionSystem.PlayerCanInteract() == false) return;
+            transform.position = MouseUitility.GetMouseWorldPositionInWorldSpace(-1);
+        }
+
+        private void OnMouseUp()
+        {
+            if (interactionSystem.PlayerCanInteract() == false) return;
+            if (Physics.Raycast(
+                transform.position, Vector3.forward,
+                out RaycastHit hit, 10f, interactionLayerMask))
+            {
+                DoMouseUpAction(hit);
+            }
+            else
+            {
+                transform.position = dragStartPos;
+                transform.rotation = dragStartRot;
+            }
+            Lock(interactionSystem, () => { interactionSystem.PLayerIsDragging = false; });
+        }
+   
+
         #endregion
 
-
+        private void DoMouseUpAction(RaycastHit hitInfo)
+        {
+            //TODO: 根据射线检测到的物体，执行不同的操作
+            PlayCardGA playCardGa = new PlayCardGA(Card);
+            ActionSystem.Instance.PerformGameAction(playCardGa);
+        }
     }
 }

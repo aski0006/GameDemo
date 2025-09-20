@@ -6,7 +6,7 @@
         {
             if (list == null || list.Count == 0)
             {
-                throw new System.InvalidOperationException("Cannot get a random element from an empty or null list.");
+                return default;
             }
             int randomIndex = UnityEngine.Random.Range(0, list.Count);
             T t = list[randomIndex];

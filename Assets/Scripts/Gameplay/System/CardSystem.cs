@@ -29,11 +29,17 @@ namespace Gameplay.System
         private readonly List<Card> hand = new(); // 手牌
         private readonly List<Card> discardPile = new(); // 弃牌堆
 
+        private void LogCardAmount()
+        {
+            LogInfo($"抽牌堆数量: {drawPile.Count}");
+            LogInfo($"手牌数量: {hand.Count}");
+            LogInfo($"弃牌堆数量: {discardPile.Count}");
+        }
         private void OnEnable()
         {
             ActionSystem.Instance.AttachPerformer<DrawCardGA>(DrawCardPerformer);
             ActionSystem.Instance.AttachPerformer<DiscardAllCardGA>(DiscardAllCardPerformer);
-
+            ActionSystem.Instance.AttachPerformer<PlayCardGA>(PlayCardPerformer);
             ActionSystem.Instance.SubscribePre<EnemyTurnGA>(EnemyTurnPreReaction);
             ActionSystem.Instance.SubscribePost<EnemyTurnGA>(EnemyTurnPostReaction);
         }
@@ -43,14 +49,14 @@ namespace Gameplay.System
             if (ActionSystem.Instance == null) return;
             ActionSystem.Instance.DetachPerformer<DrawCardGA>();
             ActionSystem.Instance.DetachPerformer<DiscardAllCardGA>();
-
+            ActionSystem.Instance.DetachPerformer<PlayCardGA>();
             ActionSystem.Instance.UnsubscribePre<EnemyTurnGA>(EnemyTurnPreReaction);
             ActionSystem.Instance.UnsubscribePost<EnemyTurnGA>(EnemyTurnPostReaction);
         }
 
-        public void Setup(List<CardData> cardDatas)
+        public void Setup(List<CardData> cards)
         {
-            foreach (var cardData in cardDatas)
+            foreach (var cardData in cards)
             {
                 drawPile.Add(new Card(cardData));
             }
@@ -68,19 +74,29 @@ namespace Gameplay.System
                 RefillDeck(); // 重置牌堆
                 for (int i = 0; i < noneDrawAmount; i++) yield return DrawCard();
             }
+            LogCardAmount();
             yield return null;
         }
-
-
         private IEnumerator DiscardAllCardPerformer(DiscardAllCardGA discardAllCardGa)
         {
-            foreach (var card in hand)
+            var handCopy = new List<Card>(hand);
+            foreach (var card in handCopy)
             {
-                discardPile.Add(card);
-                CardViewer view = handViewer.GetCardViewByCard(card);
-                yield return DiscardCard(view);
+                hand.Remove(card);      // ✅ 先删数据
+                discardPile.Add(card);  // ✅ 再进弃牌堆
+                yield return DiscardCard(card); // 只处理视图
             }
+            LogCardAmount();
+        }
+        private IEnumerator PlayCardPerformer(PlayCardGA playCardGa)
+        {
+            if (playCardGa == null || playCardGa.Card == null) yield break;
+            if (!hand.Contains(playCardGa.Card)) yield break;
 
+            var card = playCardGa.Card;
+            hand.Remove(card);     // ✅ 先移出手牌
+            discardPile.Add(card); // ✅ 立即进弃牌堆
+            yield return DiscardCard(card); // 视图动画
         }
 
         #endregion
@@ -97,26 +113,36 @@ namespace Gameplay.System
 
         private IEnumerator DrawCard()
         {
+            if (drawPile.Count == 0)
+            {
+                if (discardPile.Count == 0)
+                {
+                    yield break;
+                }
+                RefillDeck();
+            }
+
             var card = drawPile.DrawRandomElement();
             hand.Add(card);
             var view = cardViewCreator.CreateCardView(
                 card,
                 drawPileMountPoint.position,
                 drawPileMountPoint.rotation);
-           handViewer.AddCardViewToHandView(view);
+            handViewer.AddCardViewToHandView(view);
             yield return null;
         }
 
-        private IEnumerator DiscardCard(CardViewer view)
+        private IEnumerator DiscardCard(Card card)
         {
-
+            CardViewer view = handViewer.GetCardViewByCard(card);
             if (view == null) yield break;
+
             view.transform.DOScale(Vector3.zero, 0.15f);
             Tween tween = view.transform.DOMove(discardPileMountPoint.position, 0.15f);
             yield return tween.WaitForCompletion();
+
             ObjectPool.Return(view.gameObject);
             handViewer.RemoveCardViewFromHandView(view);
-            yield return null;
         }
 
         private void RefillDeck()
