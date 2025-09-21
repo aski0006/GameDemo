@@ -1,0 +1,27 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ad72abdcaf5d4d8eb609f213e57bbcfb, type: 3}
+  m_Name: DrawCard
+  m_EditorClassIdentifier: 
+  cardName: Draw Card
+  cardDescription: 'Draw 2 Card '
+  cardCost: 2
+  cardSprite: {fileID: 21300000, guid: 91ba5a7122ec2554f9a85d339946b03e, type: 3}
+  <cardEffects>k__BackingField:
+  - rid: 6300106450631917640
+  references:
+    version: 2
+    RefIds:
+    - rid: 6300106450631917640
+      type: {class: DrawCardEffect, ns: Gameplay.Effects, asm: Assembly-CSharp}
+      data:
+        drawCount: 2

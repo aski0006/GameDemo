@@ -10,7 +10,7 @@ namespace AsakiFramework
         [Header("Asaki 框架脚本")]
         [Header("作者：Asaki")]
         [Header("详细日志信息启用")]
-        [SerializeField] private bool isVerbose = false;
+        [SerializeField] private bool isVerbose;
         #region 日志方法
 
         /* 发布版彻底剔除 */

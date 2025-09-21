@@ -110,6 +110,43 @@ namespace AsakiFramework
             
             public int Count => _handlers.Count;
         }
+        public delegate void RefAction<T>(ref T e) where T : struct; // 引用类型事件
+        
+        /// <summary>
+        /// 支持 ref 的事件处理器包装器
+        /// </summary>
+        private class RefEventHandler<T> : IEventHandler where T : struct
+        {
+            private readonly List<RefAction<T>> _handlers = new();
+            private readonly List<RefAction<T>> _toRemove = new();
+            private bool _invoking;
+
+            public void Add(RefAction<T> handler)
+            {
+                if (handler == null) return;
+                if (!_handlers.Contains(handler)) _handlers.Add(handler);
+            }
+
+            public void Remove(RefAction<T> handler)
+            {
+                if (_invoking) _toRemove.Add(handler);
+                else _handlers.Remove(handler);
+            }
+
+            public void Invoke(ref T eventData)
+            {
+                if (_handlers.Count == 0) return;
+                _invoking = true;
+                foreach (var h in _handlers) h?.Invoke(ref eventData);
+                _invoking = false;
+                foreach (var h in _toRemove) _handlers.Remove(h);
+                _toRemove.Clear();
+            }
+
+            void IEventHandler.Remove(object handler) => Remove(handler as RefAction<T>);
+            void IEventHandler.Clear() { _handlers.Clear(); _toRemove.Clear(); }
+            public int Count => _handlers.Count;
+        }
         
         /// <summary>
         /// 事件统计信息
@@ -131,6 +168,7 @@ namespace AsakiFramework
         
         private readonly Dictionary<Type, IEventHandler> _eventHandlers = new Dictionary<Type, IEventHandler>();
         private readonly Dictionary<Type, EventStatistics> _statistics = new Dictionary<Type, EventStatistics>();
+        private readonly Dictionary<Type, IEventHandler> _refHandlers = new Dictionary<Type, IEventHandler>();
         
         [Header("调试设置")]
         [SerializeField] private bool _enableDebugLogging = false;
@@ -215,7 +253,17 @@ namespace AsakiFramework
                 Debug.Log($"[EventBus] Subscribed {handler.Method.Name} to event {eventType.Name}");
             }
         }
-        
+        /// <summary>订阅 ref 事件（零 GC）</summary>
+        public void SubscribeRef<T>(RefAction<T> handler) where T : struct
+        {
+            var t = typeof(T);
+            if (!_refHandlers.TryGetValue(t, out var h))
+            {
+                h = new RefEventHandler<T>();
+                _refHandlers[t] = h;
+            }
+            (h as RefEventHandler<T>)?.Add(handler);
+        }
         /// <summary>
         /// 取消订阅事件
         /// </summary>
@@ -261,6 +309,12 @@ namespace AsakiFramework
             }
         }
         
+        /// <summary>取消订阅 ref 事件</summary>
+        public void UnsubscribeRef<T>(RefAction<T> handler) where T : struct
+        {
+            if (_refHandlers.TryGetValue(typeof(T), out var h))
+                (h as RefEventHandler<T>)?.Remove(handler);
+        }
         /// <summary>
         /// 触发事件
         /// </summary>
@@ -308,7 +362,13 @@ namespace AsakiFramework
                 Debug.LogWarning($"[EventBus] No handlers registered for event {eventType.Name}");
             }
         }
-        
+        /// <summary>触发 ref 事件（零 GC）</summary>
+        public void TriggerRef<T>(ref T eventData) where T : struct
+        {
+            var t = typeof(T);
+            if (_refHandlers.TryGetValue(t, out var h))
+                (h as RefEventHandler<T>)?.Invoke(ref eventData);
+        }
         /// <summary>
         /// 清理特定事件的所有处理器
         /// </summary>
@@ -346,6 +406,9 @@ namespace AsakiFramework
             
             _eventHandlers.Clear();
             _statistics.Clear();
+            
+            foreach (var v in _refHandlers.Values) v.Clear();
+            _refHandlers.Clear();
             
             if (_enableDebugLogging)
             {

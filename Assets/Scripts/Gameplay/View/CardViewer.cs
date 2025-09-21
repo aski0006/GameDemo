@@ -24,6 +24,7 @@ namespace Gameplay.View
         [Header("卡牌交互层"), SerializeField] private LayerMask interactionLayerMask;
         private CardViewHoverSystem cardViewHoverSystem;
         private InteractionSystem interactionSystem;
+        private CostSystem costSystem;
 
         //---------------------------------------------------------------
         private Vector3 dragStartPos;
@@ -36,6 +37,7 @@ namespace Gameplay.View
             HasNotNullComponent(cardCostText);
             cardViewHoverSystem = GetOrAddComponent<CardViewHoverSystem>(FindComponentMode.Scene);
             interactionSystem = GetOrAddComponent<InteractionSystem>(FindComponentMode.Scene);
+            costSystem = GetOrAddComponent<CostSystem>(FindComponentMode.Scene);
         }
         public Card Card { get; private set; }
         // 视图初始化
@@ -85,9 +87,16 @@ namespace Gameplay.View
         private void OnMouseUp()
         {
             if (interactionSystem.PlayerCanInteract() == false) return;
+            var e = new CostSystem.TryPlayCardEvent
+            {
+                cardCost = Card.cardCost,
+                canPlay = true // 默认允许
+            };
+            EventBus.Instance.TriggerRef(ref e);
             if (Physics.Raycast(
-                transform.position, Vector3.forward,
-                out RaycastHit hit, 10f, interactionLayerMask))
+                    transform.position, Vector3.forward,
+                    out RaycastHit hit, 10f, interactionLayerMask) && e.canPlay
+            )
             {
                 DoMouseUpAction(hit);
             }
@@ -98,7 +107,6 @@ namespace Gameplay.View
             }
             Lock(interactionSystem, () => { interactionSystem.PLayerIsDragging = false; });
         }
-   
 
         #endregion
 

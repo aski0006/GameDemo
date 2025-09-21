@@ -7,6 +7,7 @@ using Gameplay.Creator;
 using Gameplay.GA;
 using Gameplay.View;
 using Model;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -28,13 +29,6 @@ namespace Gameplay.System
         private readonly List<Card> drawPile = new(); // 抽牌堆
         private readonly List<Card> hand = new(); // 手牌
         private readonly List<Card> discardPile = new(); // 弃牌堆
-
-        private void LogCardAmount()
-        {
-            LogInfo($"抽牌堆数量: {drawPile.Count}");
-            LogInfo($"手牌数量: {hand.Count}");
-            LogInfo($"弃牌堆数量: {discardPile.Count}");
-        }
         private void OnEnable()
         {
             ActionSystem.Instance.AttachPerformer<DrawCardGA>(DrawCardPerformer);
@@ -43,7 +37,6 @@ namespace Gameplay.System
             ActionSystem.Instance.SubscribePre<EnemyTurnGA>(EnemyTurnPreReaction);
             ActionSystem.Instance.SubscribePost<EnemyTurnGA>(EnemyTurnPostReaction);
         }
-
         private void OnDisable()
         {
             if (ActionSystem.Instance == null) return;
@@ -74,7 +67,6 @@ namespace Gameplay.System
                 RefillDeck(); // 重置牌堆
                 for (int i = 0; i < noneDrawAmount; i++) yield return DrawCard();
             }
-            LogCardAmount();
             yield return null;
         }
         private IEnumerator DiscardAllCardPerformer(DiscardAllCardGA discardAllCardGa)
@@ -82,21 +74,26 @@ namespace Gameplay.System
             var handCopy = new List<Card>(hand);
             foreach (var card in handCopy)
             {
-                hand.Remove(card);      // ✅ 先删数据
-                discardPile.Add(card);  // ✅ 再进弃牌堆
+                hand.Remove(card); // ✅ 先删数据
+                discardPile.Add(card); // ✅ 再进弃牌堆
                 yield return DiscardCard(card); // 只处理视图
             }
-            LogCardAmount();
         }
         private IEnumerator PlayCardPerformer(PlayCardGA playCardGa)
         {
             if (playCardGa == null || playCardGa.Card == null) yield break;
             if (!hand.Contains(playCardGa.Card)) yield break;
-
             var card = playCardGa.Card;
-            hand.Remove(card);     // ✅ 先移出手牌
+            hand.Remove(card); // ✅ 先移出手牌
             discardPile.Add(card); // ✅ 立即进弃牌堆
             yield return DiscardCard(card); // 视图动画
+            UsageCostGA usageCostGa = new UsageCostGA(card.cardCost);
+            ActionSystem.Instance.PerformGameAction(usageCostGa); // 扣除费用
+            foreach (var effect in card.cardEffects)
+            {
+                PerformEffectGA performEffectGa = new PerformEffectGA(effect);
+                playCardGa.AddPerformReaction(performEffectGa);
+            }
         }
 
         #endregion
