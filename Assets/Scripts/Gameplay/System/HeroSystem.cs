@@ -2,6 +2,7 @@
 using Data;
 using Gameplay.Controller;
 using Gameplay.Creator;
+using Gameplay.View;
 using Model;
 using System;
 using System.Collections.Generic;
@@ -15,7 +16,8 @@ namespace Gameplay.System
         [SerializeField] private List<HeroCharacterData> heroCharacterDataList = new();
         [Header("英雄视图创建器"), NotNullComponent]
         [SerializeField] private HeroCharacterCreator heroCharacterCreator;
-
+        [Header("英雄区域"), SerializeField] private CombatantAreaView heroArea;
+        
         private Dictionary<HeroCharacter, HeroCharacterController> heroCharacterControllerDict = new();
 
         private void Awake()
@@ -23,7 +25,7 @@ namespace Gameplay.System
             HasNotNullComponent(heroCharacterCreator);
             LoadHeroCharacterModel();
         }
-        
+
         private void LoadHeroCharacterModel()
         {
             var handler = new HeroCreatorHandler(this);
@@ -47,7 +49,13 @@ namespace Gameplay.System
             public HeroCharacterController Create(HeroCharacterData data)
             {
                 var model = new HeroCharacter(data);
-                var view = _owner.heroCharacterCreator.CreateHeroCharacterView(Vector3.zero, Quaternion.identity);
+                var view = _owner.heroCharacterCreator.CreateHeroCharacterView(
+                    Vector3.zero, Quaternion.identity);
+                if (_owner.heroArea.TryRegister(view) == false)
+                {
+                    OnError(data, new Exception("英雄区域已满"));
+                    return null;
+                }
                 var ctrl = new HeroCharacterController(model, view);
                 _owner.heroCharacterControllerDict.Add(model, ctrl);
                 return ctrl;

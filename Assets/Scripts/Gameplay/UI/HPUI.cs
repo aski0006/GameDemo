@@ -35,7 +35,7 @@ namespace Gameplay.UI
         public void Show() => Hp.SetActive(true);
         public void Hide() => Hp.SetActive(false);
 
-        public void UpdateHp(float currentValue, float maxValue)
+        public void UpdateHpUI(float currentValue, float maxValue)
         {
             if (maxValue == 0f) return; // 避免除以零
             float scaleValue = currentValue / maxValue;

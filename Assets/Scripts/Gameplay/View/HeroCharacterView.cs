@@ -1,7 +1,8 @@
-﻿namespace Gameplay.View
+﻿using UnityEngine;
+
+namespace Gameplay.View
 {
     public class HeroCharacterView : CombatantVIewBase
     {
-        
     }
 }

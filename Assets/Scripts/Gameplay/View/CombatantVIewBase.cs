@@ -46,7 +46,7 @@ namespace Gameplay.View
             RefreshView();
         }
 
-        public virtual void RefreshView()
+        public virtual void RefreshView() 
         {
             if (boundModel == null) return;
             BaseCombatantSetup(
@@ -63,7 +63,7 @@ namespace Gameplay.View
         {
             combatantRenderer.sprite = CombatantSprite;
             combatantName.text = combatantNameText;
-            hpUI.UpdateHp(currentHp, maxHp);
+            hpUI.UpdateHpUI(currentHp, maxHp);
         }
     }
 }

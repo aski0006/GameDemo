@@ -22,7 +22,7 @@ namespace Gameplay.System
                 LogError("HeroCharacterData or HeroCharacterView is not assigned in the inspector.");
                 return;
             }
-            heroController = new HeroCharacterController(new CombatantModel(heroData), heroView);
+            heroController = new HeroCharacterController(new HeroCharacter(heroData), heroView);
         }
         
         private void Update()

@@ -15,4 +15,8 @@ MonoBehaviour:
   cardName: Test Card
   cardDescription: This is a Test
   cardCost: 3
-  cardSprite: {fileID: 21300000, guid: 95839619a92d8384ca9a0e3ad42ba531, type: 3}
+  cardSprite: {fileID: -396958720281695618, guid: ab77ac1cfcbce54458157e8092274813, type: 3}
+  <cardEffects>k__BackingField: []
+  references:
+    version: 2
+    RefIds: []
