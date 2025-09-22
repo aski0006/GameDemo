@@ -7,9 +7,9 @@ namespace Gameplay.Controller
     public class CombatantBaseController
     {
         private CombatantModel model;
-        private CombatantVIewBase view;
+        private CombatantViewBase view;
 
-        public CombatantBaseController(CombatantModel model, CombatantVIewBase view)
+        public CombatantBaseController(CombatantModel model, CombatantViewBase view)
         {
             this.model = model;
             this.view = view;
@@ -42,7 +42,7 @@ namespace Gameplay.Controller
             return null;
         }
 
-        public T GetView<T>() where T : CombatantVIewBase
+        public T GetView<T>() where T : CombatantViewBase
         {
             if (view is T specificView)
                 return specificView;

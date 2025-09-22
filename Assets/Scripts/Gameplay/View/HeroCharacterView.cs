@@ -2,7 +2,7 @@
 
 namespace Gameplay.View
 {
-    public class HeroCharacterView : CombatantVIewBase
+    public class HeroCharacterView : CombatantViewBase
     {
     }
 }

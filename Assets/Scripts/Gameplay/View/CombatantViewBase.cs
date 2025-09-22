@@ -7,7 +7,7 @@ using UnityEngine;
 
 namespace Gameplay.View
 {
-    public class CombatantVIewBase : AsakiMono
+    public class CombatantViewBase : AsakiMono
     {
         [NotNullComponent, Header("战斗单位包装器"), SerializeField] public GameObject combatantWrapper;
         [NotNullComponent, Header("战斗单位精灵渲染器"), SerializeField] public SpriteRenderer combatantRenderer;

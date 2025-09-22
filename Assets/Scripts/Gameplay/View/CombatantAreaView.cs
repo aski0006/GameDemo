@@ -11,8 +11,8 @@ namespace Gameplay.View
         private sealed class Slot
         {
             [SerializeField] private Transform anchor;
-            private CombatantVIewBase occupant;
-            public CombatantVIewBase Occupant => occupant;
+            private CombatantViewBase occupant;
+            public CombatantViewBase Occupant => occupant;
             public Transform Anchor
             {
                 get => anchor;
@@ -20,9 +20,9 @@ namespace Gameplay.View
             }
 
             public bool IsFree => occupant == null;
-            public void Occupy(CombatantVIewBase view) => occupant = view;
+            public void Occupy(CombatantViewBase view) => occupant = view;
             public void Clear() => occupant = null;
-            public void Apply(CombatantVIewBase view)
+            public void Apply(CombatantViewBase view)
             {
                 view.transform.SetParent(anchor);
                 view.transform.localPosition = Vector3.zero;
@@ -44,7 +44,7 @@ namespace Gameplay.View
         }
 
         /* ---------------------------------------------------------- */
-        public bool TryRegister(CombatantVIewBase view)
+        public bool TryRegister(CombatantViewBase view)
         {
             if (view == null) return false;
 
@@ -62,7 +62,7 @@ namespace Gameplay.View
             return true;
         }
 
-        public void Unregister(CombatantVIewBase view)
+        public void Unregister(CombatantViewBase view)
         {
             if (view == null) return;
 
@@ -109,5 +109,6 @@ namespace Gameplay.View
 #endif
 
         #endregion
+        public bool HasAvailableSlot() => freeIndexQueue.Count > 0;
     }
 }

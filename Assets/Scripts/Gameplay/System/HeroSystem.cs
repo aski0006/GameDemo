@@ -12,25 +12,19 @@ namespace Gameplay.System
 {
     public class HeroSystem : AsakiMono
     {
-        [Header("英雄数据资产列表")]
-        [SerializeField] private List<HeroCharacterData> heroCharacterDataList = new();
+        
         [Header("英雄视图创建器"), NotNullComponent]
         [SerializeField] private HeroCharacterCreator heroCharacterCreator;
         [Header("英雄区域"), SerializeField] private CombatantAreaView heroArea;
         
         private Dictionary<HeroCharacter, HeroCharacterController> heroCharacterControllerDict = new();
-
-        private void Awake()
-        {
-            HasNotNullComponent(heroCharacterCreator);
-            LoadHeroCharacterModel();
-        }
-
-        private void LoadHeroCharacterModel()
+        
+        #region 创建英雄角色
+        public void LoadHeroCharacterModel(List<HeroCharacterData> dataList)
         {
             var handler = new HeroCreatorHandler(this);
             CreateOverFrames(
-                source: heroCharacterDataList,
+                source: dataList,
                 handler: handler,
                 perFrame: 3,
                 maxMillisPerFrame: 8f,
@@ -53,7 +47,8 @@ namespace Gameplay.System
                     Vector3.zero, Quaternion.identity);
                 if (_owner.heroArea.TryRegister(view) == false)
                 {
-                    OnError(data, new Exception("英雄区域已满"));
+                    // 英雄区域已满
+                    _owner.heroCharacterCreator.ReturnHeroCharacterView(view);
                     return null;
                 }
                 var ctrl = new HeroCharacterController(model, view);
@@ -66,7 +61,20 @@ namespace Gameplay.System
                 _owner.LogError($"创建英雄失败：{data.name}，错误：{e}");
             }
         }
+        #endregion
+        
+        public List<HeroCharacterController> GetAllHeroControllers() => new List<HeroCharacterController>(heroCharacterControllerDict.Values);
 
+        public void RemoveHero(HeroCharacter model)
+        {
+            if (heroCharacterControllerDict.TryGetValue(model, out var ctrl))
+            {
+                var view = ctrl.GetView<HeroCharacterView>();
+                heroArea.Unregister(view);
+                heroCharacterCreator.ReturnHeroCharacterView(view);
+                heroCharacterControllerDict.Remove(model);
+            }
+        }
 
     }
 }

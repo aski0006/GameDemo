@@ -1,7 +1,9 @@
-﻿using UnityEngine;
+﻿using AsakiFramework.Data;
+using UnityEngine;
 
 namespace Data
 {
+    [CustomData(category:"角色数据/敌人角色数据", description: "敌人角色的基础数据")]
     public class EnemyCharacterData : CombatantBaseData
     {
 

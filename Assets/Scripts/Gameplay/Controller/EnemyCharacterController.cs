@@ -5,7 +5,7 @@ namespace Gameplay.Controller
 {
     public class EnemyCharacterController : CombatantBaseController
     {
-        public EnemyCharacterController(EnemyCharacter model, CombatantVIewBase view) : base(model, view)
+        public EnemyCharacterController(EnemyCharacter model, CombatantViewBase view) : base(model, view)
         { }
 
         public void ModifyAttack(int change) => GetModel<EnemyCharacter>().ModifyAttack(change);

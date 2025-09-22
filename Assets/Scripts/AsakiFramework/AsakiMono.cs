@@ -263,12 +263,12 @@ namespace AsakiFramework
             /// <summary>
             /// 真正创建逻辑，可能抛出异常
             /// </summary>
-            TResult Create(TSource source);
+            TResult Create(TSource data);
 
             /// <summary>
-            /// 创建失败时回调，参数为 source 与异常
+            /// 创建失败时回调，参数为 data 与异常
             /// </summary>
-            void OnError(TSource source, Exception e);
+            void OnError(TSource data, Exception e);
         }
 
         /// <summary>
