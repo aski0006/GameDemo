@@ -121,11 +121,14 @@ namespace Gameplay.System
 
             var card = drawPile.DrawRandomElement();
             hand.Add(card);
-            var view = cardViewCreator.CreateCardView(
-                card,
-                drawPileMountPoint.position,
-                drawPileMountPoint.rotation);
-            handViewer.AddCardViewToHandView(view);
+            RunNextFrame(() =>
+            {
+                var view = cardViewCreator.CreateCardView(
+                    card,
+                    drawPileMountPoint.position,
+                    drawPileMountPoint.rotation);
+                handViewer.AddCardViewToHandView(view);
+            });
             yield return null;
         }
 
@@ -138,7 +141,7 @@ namespace Gameplay.System
             Tween tween = view.transform.DOMove(discardPileMountPoint.position, 0.15f);
             yield return tween.WaitForCompletion();
 
-            ObjectPool.Return(view.gameObject);
+            cardViewCreator.ReturnCardView(view);
             handViewer.RemoveCardViewFromHandView(view);
         }
 

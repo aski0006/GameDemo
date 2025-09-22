@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 using Object = UnityEngine.Object;
 
@@ -108,7 +109,7 @@ namespace AsakiFramework
                 Debug.LogError("[" + name + "] 缺少必需的组件：" + typeof(T).Name, this);
             return t != null;
         }
-        
+
         /// <summary>
         /// 检查“手动拖上去的引用”到底有没有值。
         /// 编辑器内缺失立即抛异常；发布版仅返回 false。
@@ -139,7 +140,7 @@ namespace AsakiFramework
         }
 
         #endregion
-        
+
         #region 常用协程快捷方法
 
         /// <summary>
@@ -221,7 +222,7 @@ namespace AsakiFramework
         }
 
         #endregion
-        
+
         #region 线程安全锁封装
 
         /// <summary>
@@ -249,6 +250,95 @@ namespace AsakiFramework
         }
 
         #endregion
+
+        #region 分帧创建框架
+
+        /// <summary>
+        /// 分帧创建通用接口
+        /// </summary>
+        /// <typeparam name="TSource">原始数据类型</typeparam>
+        /// <typeparam name="TResult">产出结果类型</typeparam>
+        public interface IFrameCreationHandler<in TSource, out TResult>
+        {
+            /// <summary>
+            /// 真正创建逻辑，可能抛出异常
+            /// </summary>
+            TResult Create(TSource source);
+
+            /// <summary>
+            /// 创建失败时回调，参数为 source 与异常
+            /// </summary>
+            void OnError(TSource source, Exception e);
+        }
+
+        /// <summary>
+        /// 分帧创建驱动
+        /// </summary>
+        /// <param name="source">原始数据列表</param>
+        /// <param name="handler">创建器</param>
+        /// <param name="perFrame">每帧最大创建个数（默认 1）</param>
+        /// <param name="maxMillisPerFrame">单帧最大耗时（毫秒），<=0 表示不限制（默认 0）</param>
+        /// <param name="onProgress">进度回调 (current, total)</param>
+        /// <param name="onComplete">全部完成回调</param>
+        /// <typeparam name="TSource">原始数据类型</typeparam>
+        /// <typeparam name="TResult">产出结果类型</typeparam>
+        /// <returns>协程句柄</returns>
+        protected Coroutine CreateOverFrames<TSource, TResult>(
+            IList<TSource> source,
+            IFrameCreationHandler<TSource, TResult> handler,
+            int perFrame = 1,
+            float maxMillisPerFrame = 0f,
+            Action<int, int> onProgress = null,
+            Action<IList<TResult>> onComplete = null)
+        {
+            return CoroutineUtility.StartCoroutine(_CreateOverFrames(source, handler, perFrame, maxMillisPerFrame, onProgress, onComplete));
+        }
+
+        private IEnumerator _CreateOverFrames<TSource, TResult>(
+            IList<TSource> source,
+            IFrameCreationHandler<TSource, TResult> handler,
+            int perFrame,
+            float maxMillisPerFrame,
+            Action<int, int> onProgress,
+            Action<IList<TResult>> onComplete)
+        {
+            int total = source.Count;
+            var ret = new List<TResult>(total);
+            var sw = System.Diagnostics.Stopwatch.StartNew();
+
+            for (int i = 0; i < total;)
+            {
+                int createdInThisFrame = 0;
+                while (createdInThisFrame < perFrame && i < total)
+                {
+                    var item = source[i];
+                    try
+                    {
+                        var result = handler.Create(item);
+                        ret.Add(result);
+                    }
+                    catch (Exception e)
+                    {
+                        handler.OnError(item, e);
+                    }
+
+                    ++i;
+                    ++createdInThisFrame;
+
+                    // 时间片兜底
+                    if (maxMillisPerFrame > 0 && sw.ElapsedMilliseconds >= maxMillisPerFrame)
+                        break;
+                }
+
+                onProgress?.Invoke(i, total);
+                sw.Restart();
+                yield return null;
+            }
+
+            onComplete?.Invoke(ret);
+        }
+
+#endregion
 
     }
 

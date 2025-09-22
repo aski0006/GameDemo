@@ -14,7 +14,7 @@ namespace Gameplay.Creator
 
         private void Start()
         {
-            ObjectPool.Create(poolConfig.Prefab, poolConfig.InitialCapacity, poolConfig.MaxCapacity, poolConfig.PoolName);
+            ObjectPool.Create<CardViewer>(poolConfig.Prefab, poolConfig.InitialCapacity, poolConfig.MaxCapacity, poolConfig.PoolName);
         }
 
         public CardViewer CreateCardView(Card card, Vector3 position, Quaternion rotation, Transform parent = null)
@@ -37,5 +37,7 @@ namespace Gameplay.Creator
             cardView.Setup(card);
             return cardView;
         }
+        
+        public void ReturnCardView(CardViewer cardView) => ObjectPool.Return(cardView.gameObject);
     }
 }

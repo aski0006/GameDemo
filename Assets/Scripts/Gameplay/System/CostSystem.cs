@@ -42,6 +42,7 @@ namespace Gameplay.System
 
             ActionSystem.Instance?.UnsubscribePost<EnemyTurnGA>(OnEnemyTurnPostReaction);
 
+            if(EventBus.Instance == null) return;
             EventBus.Instance?.UnsubscribeRef<TryPlayCardEvent>(TryPlayCardEventHandler);
         }
 
