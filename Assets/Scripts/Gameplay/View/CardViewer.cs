@@ -3,7 +3,7 @@ using AsakiFramework.ObjectPool;
 using Gameplay.GA;
 using Gameplay.System;
 using Gameplay.Utility;
-using Model;
+using Gameplay.Model;
 using System;
 using TMPro;
 using UnityEngine;

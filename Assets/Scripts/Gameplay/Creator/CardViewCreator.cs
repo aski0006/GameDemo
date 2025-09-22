@@ -2,7 +2,7 @@
 using AsakiFramework.ObjectPool;
 using DG.Tweening;
 using Gameplay.View;
-using Model;
+using Gameplay.Model;
 using System;
 using UnityEngine;
 

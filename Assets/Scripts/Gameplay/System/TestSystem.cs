@@ -1,5 +1,5 @@
 ﻿using AsakiFramework;
-using Model;
+using Gameplay.View;
 using UnityEngine;
 
 namespace Gameplay.System
@@ -30,20 +30,20 @@ namespace Gameplay.System
         private void TestExit()
         {
             LogInfo("开始测试角色离场...");
-            
+
 
             var heroList = heroSystem.GetAllHeroControllers();
             if (heroList.Count > 0)
             {
                 var heroToRemove = heroList[0];
-                heroSystem.RemoveHero(heroToRemove.GetModel<HeroCharacter>()); // 也需要在 HeroSystem 中实现 RemoveHero 方法
+                heroSystem.RemoveHero(heroToRemove.GetView<HeroCharacterView>()); // 也需要在 HeroSystem 中实现 RemoveHero 方法
             }
-            
+
             var enemyList = enemySystem.GetAllEnemyControllers();
             if (enemyList.Count > 0)
             {
                 var enemyToRemove = enemyList[0];
-                enemySystem.RemoveEnemy(enemyToRemove.GetModel<EnemyCharacter>()); // 也需要在 EnemySystem 中实现 RemoveEnemy 方法
+                enemySystem.RemoveEnemy(enemyToRemove.GetView<EnemyCharacterView>()); // 也需要在 EnemySystem 中实现 RemoveEnemy 方法
             }
 
         }

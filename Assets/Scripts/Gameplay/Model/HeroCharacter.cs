@@ -1,6 +1,6 @@
 ﻿using Data;
 
-namespace Model
+namespace Gameplay.Model
 {
     public class HeroCharacter : CombatantModel
     {

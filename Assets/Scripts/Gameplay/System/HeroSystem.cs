@@ -3,7 +3,7 @@ using Data;
 using Gameplay.Controller;
 using Gameplay.Creator;
 using Gameplay.View;
-using Model;
+using Gameplay.Model;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
@@ -17,7 +17,7 @@ namespace Gameplay.System
         [SerializeField] private HeroCharacterCreator heroCharacterCreator;
         [Header("英雄区域"), SerializeField] private CombatantAreaView heroArea;
         
-        private Dictionary<HeroCharacter, HeroCharacterController> heroCharacterControllerDict = new();
+        private Dictionary<HeroCharacterView, HeroCharacterController> heroCharacterViews = new();
         
         #region 创建英雄角色
         public void LoadHeroCharacterModel(List<HeroCharacterData> dataList)
@@ -45,6 +45,7 @@ namespace Gameplay.System
                 var model = new HeroCharacter(data);
                 var view = _owner.heroCharacterCreator.CreateHeroCharacterView(
                     Vector3.zero, Quaternion.identity);
+                if (view == null) return null;
                 if (_owner.heroArea.TryRegister(view) == false)
                 {
                     // 英雄区域已满
@@ -52,7 +53,7 @@ namespace Gameplay.System
                     return null;
                 }
                 var ctrl = new HeroCharacterController(model, view);
-                _owner.heroCharacterControllerDict.Add(model, ctrl);
+                _owner.heroCharacterViews.Add(view, ctrl);
                 return ctrl;
             }
 
@@ -63,16 +64,15 @@ namespace Gameplay.System
         }
         #endregion
         
-        public List<HeroCharacterController> GetAllHeroControllers() => new List<HeroCharacterController>(heroCharacterControllerDict.Values);
+        public List<HeroCharacterController> GetAllHeroControllers() => new List<HeroCharacterController>(heroCharacterViews.Values);
 
-        public void RemoveHero(HeroCharacter model)
+        public void RemoveHero(HeroCharacterView view)
         {
-            if (heroCharacterControllerDict.TryGetValue(model, out var ctrl))
+            if (heroCharacterViews.TryGetValue(view, out var ctrl))
             {
-                var view = ctrl.GetView<HeroCharacterView>();
                 heroArea.Unregister(view);
                 heroCharacterCreator.ReturnHeroCharacterView(view);
-                heroCharacterControllerDict.Remove(model);
+                heroCharacterViews.Remove(view);
             }
         }
 

@@ -1,7 +1,7 @@
 ﻿using AsakiFramework;
 using DG.Tweening;
 using Gameplay.System;
-using Model;
+using Gameplay.Model;
 using System;
 using System.Collections;
 using System.Collections.Generic;

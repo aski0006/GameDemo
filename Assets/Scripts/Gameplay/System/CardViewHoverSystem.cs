@@ -1,6 +1,6 @@
 ﻿using AsakiFramework;
 using Gameplay.View;
-using Model;
+using Gameplay.Model;
 using UnityEngine;
 
 namespace Gameplay.System

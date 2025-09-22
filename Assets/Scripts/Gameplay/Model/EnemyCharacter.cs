@@ -1,7 +1,7 @@
 ﻿using Data;
 using UnityEngine;
 
-namespace Model
+namespace Gameplay.Model
 {
     public class EnemyCharacter : CombatantModel
     {

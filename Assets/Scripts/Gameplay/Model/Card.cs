@@ -3,7 +3,7 @@ using Gameplay.Effects;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace Model
+namespace Gameplay.Model
 {
     public class Card
     {

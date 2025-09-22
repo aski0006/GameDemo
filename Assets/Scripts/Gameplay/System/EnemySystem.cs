@@ -5,10 +5,11 @@ using Gameplay.Controller;
 using Gameplay.Creator;
 using Gameplay.GA;
 using Gameplay.View;
-using Model;
+using Gameplay.Model;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 namespace Gameplay.System
@@ -17,9 +18,7 @@ namespace Gameplay.System
     {
         [Header("敌人角色创建器"), SerializeField] private EnemyCharacterCreator enemyCharacterCreator;
         [Header("敌人插值区域视图"), SerializeField] private CombatantAreaView enemyAreaView;
-        Dictionary<EnemyCharacter, EnemyCharacterController> enemyCharacterControllerDic = new();
-
-        // 缓存队列：当区域满时暂存待创建的敌人数据
+        private Dictionary<EnemyCharacterView, EnemyCharacterController> enemyViews = new Dictionary<EnemyCharacterView, EnemyCharacterController>();
         private Queue<EnemyCharacterData> pendingEnemyCreationQueue = new Queue<EnemyCharacterData>();
         private bool isProcessingQueue = false;
 
@@ -67,14 +66,14 @@ namespace Gameplay.System
             {
                 var view = _owner.enemyCharacterCreator.CreateEnemyCharacterView(
                     Vector3.zero, Quaternion.identity);
-                
+                if (view == null) return null;
                 if (_owner.enemyAreaView.TryRegister(view) == false)
                 {
                     // 敌人区域已满，将数据加入缓存队列
                     _owner.LogWarning($"敌人区域已满，将敌人 {data.name} 加入等待队列");
                     _owner.enemyCharacterCreator.ReturnEnemyCharacterView(view);
                     _owner.pendingEnemyCreationQueue.Enqueue(data);
-                    
+
                     // 开始处理队列（如果还没开始）
                     if (!_owner.isProcessingQueue)
                     {
@@ -82,10 +81,10 @@ namespace Gameplay.System
                     }
                     return null;
                 }
-                
+
                 var model = new EnemyCharacter(data);
                 var ctrl = new EnemyCharacterController(model, view);
-                _owner.enemyCharacterControllerDic.Add(model, ctrl);
+                _owner.enemyViews.Add(view, ctrl);
                 return ctrl;
             }
             public void OnError(EnemyCharacterData data, Exception e)
@@ -100,7 +99,7 @@ namespace Gameplay.System
         private IEnumerator ProcessPendingEnemyCreationQueue()
         {
             isProcessingQueue = true;
-            
+
             while (pendingEnemyCreationQueue.Count > 0)
             {
                 // 检查是否有空位
@@ -108,14 +107,14 @@ namespace Gameplay.System
                 {
                     var data = pendingEnemyCreationQueue.Dequeue();
                     LogInfo($"从队列中创建等待的敌人: {data.name}");
-                    
+
                     // 创建敌人
                     var view = enemyCharacterCreator.CreateEnemyCharacterView(Vector3.zero, Quaternion.identity);
                     if (enemyAreaView.TryRegister(view))
                     {
                         var model = new EnemyCharacter(data);
                         var ctrl = new EnemyCharacterController(model, view);
-                        enemyCharacterControllerDic.Add(model, ctrl);
+                        enemyViews.Add(view, ctrl);
                     }
                     else
                     {
@@ -132,32 +131,29 @@ namespace Gameplay.System
                     yield return new WaitForSeconds(0.5f);
                 }
             }
-            
+
             isProcessingQueue = false;
             LogInfo("敌人创建队列处理完成");
         }
 
         #endregion
 
-        public List<EnemyCharacterController> GetAllEnemyControllers() => new List<EnemyCharacterController>(enemyCharacterControllerDic.Values);
+        public List<EnemyCharacterController> GetAllEnemyControllers() => new List<EnemyCharacterController>(enemyViews.Values);
 
-        public void RemoveEnemy(EnemyCharacter model)
+        public void RemoveEnemy(EnemyCharacterView view)
         {
-            if (enemyCharacterControllerDic.TryGetValue(model, out var ctrl))
+            enemyAreaView.Unregister(view);
+            enemyCharacterCreator.ReturnEnemyCharacterView(view);
+            enemyViews.Remove(view, out var controller);
+
+            LogInfo($"敌人已移除，空出槽位");
+
+            // 移除敌人后检查是否有等待创建的敌人
+            if (pendingEnemyCreationQueue.Count > 0 && !isProcessingQueue)
             {
-                var view = ctrl.GetView<EnemyCharacterView>();
-                enemyAreaView.Unregister(view);
-                enemyCharacterCreator.ReturnEnemyCharacterView(view);
-                enemyCharacterControllerDic.Remove(model);
-                
-                LogInfo($"敌人 {model.Name} 已移除，空出槽位");
-                
-                // 移除敌人后检查是否有等待创建的敌人
-                if (pendingEnemyCreationQueue.Count > 0 && !isProcessingQueue)
-                {
-                    StartCoroutine(ProcessPendingEnemyCreationQueue());
-                }
+                StartCoroutine(ProcessPendingEnemyCreationQueue());
             }
+
         }
 
         /// <summary>
@@ -174,4 +170,5 @@ namespace Gameplay.System
             LogInfo("敌人等待队列已清空");
         }
     }
+
 }

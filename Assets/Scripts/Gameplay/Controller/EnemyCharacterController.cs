@@ -1,5 +1,5 @@
 ﻿using Gameplay.View;
-using Model;
+using Gameplay.Model;
 
 namespace Gameplay.Controller
 {

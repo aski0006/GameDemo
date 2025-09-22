@@ -1,6 +1,6 @@
 ﻿using TMPro;
 using UnityEngine;
-using Model;
+using Gameplay.Model;
 
 namespace Gameplay.View
 {

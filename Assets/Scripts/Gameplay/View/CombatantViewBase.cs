@@ -1,6 +1,6 @@
 ﻿using AsakiFramework;
 using Gameplay.UI;
-using Model;
+using Gameplay.Model;
 using System;
 using TMPro;
 using UnityEngine;

@@ -6,7 +6,7 @@ using Extensions;
 using Gameplay.Creator;
 using Gameplay.GA;
 using Gameplay.View;
-using Model;
+using Gameplay.Model;
 using System;
 using System.Collections;
 using System.Collections.Generic;
