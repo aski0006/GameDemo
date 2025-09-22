@@ -8,7 +8,7 @@ namespace AsakiFramework.Editor
 {
     public class SceneObjectFinder : EditorWindow
     {
-        [MenuItem("Asaki Tools/场景对象查找器 &f")]
+        [MenuItem("Tools/场景对象查找器 &f")]
         public static void ShowWindow()
         {
             var window = GetWindow<SceneObjectFinder>();

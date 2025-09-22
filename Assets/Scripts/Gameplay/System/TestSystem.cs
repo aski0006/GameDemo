@@ -36,14 +36,14 @@ namespace Gameplay.System
             if (heroList.Count > 0)
             {
                 var heroToRemove = heroList[0];
-                heroSystem.RemoveHero(heroToRemove.GetView<HeroCharacterView>()); // 也需要在 HeroSystem 中实现 RemoveHero 方法
+                heroSystem.RemoveHeroByView(heroToRemove.GetView<HeroCharacterView>()); // 也需要在 HeroSystem 中实现 RemoveHeroByView 方法
             }
 
             var enemyList = enemySystem.GetAllEnemyControllers();
             if (enemyList.Count > 0)
             {
                 var enemyToRemove = enemyList[0];
-                enemySystem.RemoveEnemy(enemyToRemove.GetView<EnemyCharacterView>()); // 也需要在 EnemySystem 中实现 RemoveEnemy 方法
+                enemySystem.RemoveEnemyByView(enemyToRemove.GetView<EnemyCharacterView>()); // 也需要在 EnemySystem 中实现 RemoveEnemy 方法
             }
 
         }

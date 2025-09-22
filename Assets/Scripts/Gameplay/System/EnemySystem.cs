@@ -1,6 +1,6 @@
 ﻿using AsakiFramework;
-using AsakiFramework.ObjectPool;
 using Data;
+using DG.Tweening;
 using Gameplay.Controller;
 using Gameplay.Creator;
 using Gameplay.GA;
@@ -18,28 +18,58 @@ namespace Gameplay.System
     {
         [Header("敌人角色创建器"), SerializeField] private EnemyCharacterCreator enemyCharacterCreator;
         [Header("敌人插值区域视图"), SerializeField] private CombatantAreaView enemyAreaView;
-        private Dictionary<EnemyCharacterView, EnemyCharacterController> enemyViews = new Dictionary<EnemyCharacterView, EnemyCharacterController>();
+        private Dictionary<ulong, EnemyCharacterController> enemyIdToController = new Dictionary<ulong, EnemyCharacterController>();
         private Queue<EnemyCharacterData> pendingEnemyCreationQueue = new Queue<EnemyCharacterData>();
         private bool isProcessingQueue = false;
+        private HeroSystem heroSystem;
 
+        private void Awake()
+        {
+            heroSystem = GetOrAddComponent<HeroSystem>(FindComponentMode.Scene);
+        }
         private void OnEnable()
         {
+            if (ActionSystem.Instance == null) LogInfo("ActionSystem.Instance is null, EnemySystem will not attach performers.");
+            LogInfo("开始注册敌人系统的执行者");
             ActionSystem.Instance.AttachPerformer<EnemyTurnGA>(EnemyTurnPerformer);
+            ActionSystem.Instance.AttachPerformer<AttackTargetHeroGA>(AttackTargetHeroPerformer);
         }
 
         private void OnDisable()
         {
-            ActionSystem.Instance?.DetachPerformer<EnemyTurnGA>();
+            if (ActionSystem.Instance == null) return;
+            ActionSystem.Instance.DetachPerformer<EnemyTurnGA>();
+            ActionSystem.Instance.DetachPerformer<AttackTargetHeroGA>();
         }
 
-        public void Setup(List<EnemyCharacterData> dataList)
-        { }
         private IEnumerator EnemyTurnPerformer(EnemyTurnGA enemyTurnGa)
         {
-            LogInfo("Enemy Turn Started");
-            yield return new WaitForSeconds(2f);
-            LogInfo("Enemy Turn Ended");
+            LogInfo("敌人数量: " + enemyIdToController.Count);
+            foreach (var enemy in enemyIdToController.Values)
+            {
+                LogInfo($"{enemy.GetModel<EnemyCharacter>().Name}开始攻击英雄");
+                AttackTargetHeroGA attackTargetHeroGa = new AttackTargetHeroGA(enemy);
+                enemyTurnGa.AddPerformReaction(attackTargetHeroGa);
+            }
+            yield return null;
         }
+
+        private IEnumerator AttackTargetHeroPerformer(AttackTargetHeroGA attackTargetHeroGa)
+        {
+            LogInfo("开始执行 AttackTargetHeroGA");
+            var attacker = attackTargetHeroGa.Attacker;
+            var attackerView = attacker.GetView<EnemyCharacterView>();
+            Tween tween = attackerView.transform.DOMoveX(attackerView.transform.position.x - 1f, 0.15f);
+            yield return tween.WaitForCompletion();
+            attackerView.transform.DOMoveX(attackerView.transform.position.x + 1f, 0.25f);
+            EnemyCharacter enemy = attacker.GetModel<EnemyCharacter>();
+            var heroController = heroSystem.GetHeroControllerOrDefault(random: true);
+            if(heroController == null) yield break;
+            LogInfo("开始对英雄造成伤害");
+            DealDamageGA dealDamageGa = new DealDamageGA(enemy.CurrentAtk, new List<CombatantBaseController> { heroController });
+            attackTargetHeroGa.AddPerformReaction(dealDamageGa);
+        }
+
 
         #region 创建敌人角色
 
@@ -84,7 +114,7 @@ namespace Gameplay.System
 
                 var model = new EnemyCharacter(data);
                 var ctrl = new EnemyCharacterController(model, view);
-                _owner.enemyViews.Add(view, ctrl);
+                _owner.enemyIdToController.Add(ctrl.modelId, ctrl);
                 return ctrl;
             }
             public void OnError(EnemyCharacterData data, Exception e)
@@ -114,7 +144,7 @@ namespace Gameplay.System
                     {
                         var model = new EnemyCharacter(data);
                         var ctrl = new EnemyCharacterController(model, view);
-                        enemyViews.Add(view, ctrl);
+                        enemyIdToController.Add(ctrl.modelId, ctrl);
                     }
                     else
                     {
@@ -138,15 +168,34 @@ namespace Gameplay.System
 
         #endregion
 
-        public List<EnemyCharacterController> GetAllEnemyControllers() => new List<EnemyCharacterController>(enemyViews.Values);
+        #region 敌人槽位管理
 
-        public void RemoveEnemy(EnemyCharacterView view)
+        public List<EnemyCharacterController> GetAllEnemyControllers() => new List<EnemyCharacterController>(enemyIdToController.Values);
+
+        public void RemoveEnemyById(ulong enemyId)
+        {
+            var ctrl = enemyIdToController.GetValueOrDefault(enemyId);
+            if (ctrl == null)
+            {
+                LogError("无法找到敌人，ID: " + enemyId);
+                return;
+            }
+            var view = ctrl.GetView<EnemyCharacterView>();
+            enemyAreaView.Unregister(view);
+            enemyCharacterCreator.ReturnEnemyCharacterView(view);
+            enemyIdToController.Remove(enemyId);
+            if (pendingEnemyCreationQueue.Count > 0 && !isProcessingQueue)
+            {
+                StartCoroutine(ProcessPendingEnemyCreationQueue());
+            }
+        }
+        public void RemoveEnemyByView(EnemyCharacterView view)
         {
             enemyAreaView.Unregister(view);
             enemyCharacterCreator.ReturnEnemyCharacterView(view);
-            enemyViews.Remove(view, out var controller);
-
-            LogInfo($"敌人已移除，空出槽位");
+            var ctrls = enemyIdToController.Values.ToList();
+            var ctrl = ctrls.Find(c => c.GetView<EnemyCharacterView>() == view);
+            enemyIdToController.Remove(ctrl.modelId);
 
             // 移除敌人后检查是否有等待创建的敌人
             if (pendingEnemyCreationQueue.Count > 0 && !isProcessingQueue)
@@ -169,6 +218,8 @@ namespace Gameplay.System
             pendingEnemyCreationQueue.Clear();
             LogInfo("敌人等待队列已清空");
         }
+
+        #endregion
     }
 
 }

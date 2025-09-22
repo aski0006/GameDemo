@@ -4,7 +4,7 @@ using UnityEngine;
 using System.Reflection;
 using System.Collections.Generic;
 
-namespace Editor.Inspector
+namespace AsakiFramework.Editor
 {
 
     public static class PrintSelectedGameObjectInfo

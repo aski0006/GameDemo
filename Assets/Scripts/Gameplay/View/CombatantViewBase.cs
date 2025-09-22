@@ -42,13 +42,11 @@ namespace Gameplay.View
 
         public void BindModel(CombatantModel model)
         {
+            if (model == null)
+            {
+                return;
+            }
             boundModel = model;
-            RefreshView();
-        }
-
-        public virtual void RefreshView() 
-        {
-            if (boundModel == null) return;
             BaseCombatantSetup(
                 boundModel.Sprite,
                 boundModel.Name,
@@ -57,13 +55,16 @@ namespace Gameplay.View
             );
         }
 
-        public void BaseCombatantSetup(Sprite CombatantSprite, string combatantNameText,
-            float currentHp, float maxHp
+        public virtual void RefreshView()
+        {
+            hpUI.UpdateHpUI(boundModel.CurrentHp, boundModel.MaxHp);
+        }
+
+        private void BaseCombatantSetup(Sprite CombatantSprite, string combatantNameText, float currentHp, float maxHp
         )
         {
             combatantRenderer.sprite = CombatantSprite;
             combatantName.text = combatantNameText;
-            hpUI.UpdateHpUI(currentHp, maxHp);
         }
     }
 }

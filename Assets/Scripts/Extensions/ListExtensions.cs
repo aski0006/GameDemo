@@ -1,4 +1,6 @@
-﻿namespace Extensions
+﻿using System.Collections.Generic;
+
+namespace Extensions
 {
     public static class ListExtensions
     {
@@ -13,7 +15,6 @@
             list.RemoveAt(randomIndex);
             return t;
         }
-        
         public static void Shuffle<T>(this System.Collections.Generic.List<T> list)
         {
             int n = list.Count;
@@ -23,5 +24,6 @@
                 (list[i], list[r]) = (list[r], list[i]);
             }
         }
+        
     }
 }

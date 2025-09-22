@@ -40,6 +40,7 @@ namespace AsakiFramework
         {
             Func<GameAction, IEnumerator> wrapped = a => performer((T)a);
             _perfSubs[typeof(T)] = wrapped;
+            Debug.Log($"[ActionSystem] 添加执行器：{typeof(T).Name}");
         }
         public void DetachPerformer<T>() where T : GameAction
         {

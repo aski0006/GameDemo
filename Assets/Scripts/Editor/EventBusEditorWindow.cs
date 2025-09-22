@@ -21,7 +21,7 @@ namespace AsakiFramework.Editor
         private float _lastRefreshTime;
         private const float REFRESH_INTERVAL = 1f;
         
-        [MenuItem("AsakiFramework/事件总线调试器")]
+        [MenuItem("Asaki 框架/事件总线调试器")]
         public static void ShowWindow()
         {
             GetWindow<EventBusEditorWindow>("EventBus Debugger");

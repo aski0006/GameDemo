@@ -28,7 +28,6 @@ namespace Gameplay.View
                 view.transform.localPosition = Vector3.zero;
                 view.transform.localRotation = Quaternion.identity;
                 view.transform.localScale = Vector3.one;
-                Debug.Log("应用插槽位置" + anchor.name);
             }
         }
 
@@ -72,7 +71,6 @@ namespace Gameplay.View
 
                 slots[i].Clear();
                 freeIndexQueue.Enqueue(i); // 归还队列
-                view.Hide();
                 view.transform.SetParent(null);
                 return;
             }

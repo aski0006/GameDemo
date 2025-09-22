@@ -13,7 +13,19 @@ namespace AsakiFramework
         [Header("详细日志信息启用")]
         [SerializeField] private bool isVerbose;
         #region 日志方法
-
+            public bool IsLogEnabled 
+            { 
+                get => isVerbose; 
+                set => isVerbose = value; 
+            }
+            public static void SetAllLogsEnabled(bool enabled)
+            {
+                var allMonos = FindObjectsByType<AsakiMono>(FindObjectsSortMode.InstanceID);
+                foreach (var mono in allMonos)
+                {
+                    mono.isVerbose = enabled;
+                }
+            }
         /* 发布版彻底剔除 */
 #if UNITY_EDITOR
         [System.Diagnostics.Conditional("UNITY_EDITOR")]
@@ -139,6 +151,10 @@ namespace AsakiFramework
             return cache;
         }
 
+        protected T FromScene<T>() where T : Component
+        {
+            return GetOrAddComponent<T>(FindComponentMode.Scene);
+        }
         #endregion
 
         #region 常用协程快捷方法

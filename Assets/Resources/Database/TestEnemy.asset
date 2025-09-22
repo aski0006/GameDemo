@@ -15,5 +15,5 @@ MonoBehaviour:
   combatantSprite: {fileID: 21300000, guid: f65ab088bfaee3d408c7d3106f66f4b3, type: 3}
   combatantName: Test Enemy
   combatantMaxHp: 99
-  enemyAttack: 10
+  enemyAttack: 50
   enemyDefense: 5

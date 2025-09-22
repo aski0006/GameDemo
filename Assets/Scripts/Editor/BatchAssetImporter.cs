@@ -42,7 +42,7 @@ namespace AssetImportTool
         private string currentPresetName = "Default";
         
         // 添加菜单项
-        [MenuItem("AsakiFramework/批量资产导入器")]
+        [MenuItem("Asaki 框架/批量资产导入器")]
         public static void ShowWindow()
         {
             GetWindow<BatchAssetImporter>("Batch Asset Importer");

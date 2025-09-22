@@ -4,6 +4,11 @@ using UnityEngine;
 
 namespace Gameplay.Model
 {
+    public enum CombatantType
+    {
+        Hero,
+        Enemy,
+    }
     public class CombatantModel
     {
         private CombatantBaseData combatantBaseData;
@@ -13,12 +18,14 @@ namespace Gameplay.Model
         public float CurrentHp { get; set; }
         public bool IsDead => CurrentHp <= 0;
 
+        protected CombatantType modelType;
         private static ulong _nextID = 1; // 静态字段用于生成唯一ID
         public ulong CombatantInstanceID { get; } = _nextID++; // 每个实例的唯一ID
         [RuntimeInitializeOnLoadMethod]
         static void ResetID() => _nextID = 1; // 重置ID
-        public struct CombatantDeathEvent
+        public struct CombatantModelDeathEvent
         {
+            public CombatantType Type;
             public ulong InstanceID; // 谁死亡
         }
 
@@ -27,7 +34,10 @@ namespace Gameplay.Model
             if (IsDead) return;
             if (damage <= 0) return;
             CurrentHp = Mathf.Max(0, CurrentHp - damage);
-            if (IsDead) EventBus.Instance.Trigger(new CombatantDeathEvent { InstanceID = CombatantInstanceID });
+            if (IsDead)
+            {
+                EventBus.Instance.Trigger(new CombatantModelDeathEvent { Type = modelType, InstanceID = CombatantInstanceID });
+            }
         }
 
         public virtual void Heal(float amount)
@@ -37,10 +47,11 @@ namespace Gameplay.Model
             CurrentHp = Mathf.Min(MaxHp, CurrentHp + amount);
         }
 
-        public CombatantModel(CombatantBaseData data)
+        public CombatantModel(CombatantBaseData data, CombatantType type)
         {
             combatantBaseData = data;
             CurrentHp = MaxHp;
+            modelType = type;
         }
 
 

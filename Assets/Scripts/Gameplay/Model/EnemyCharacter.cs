@@ -1,4 +1,5 @@
-﻿using Data;
+﻿using AsakiFramework;
+using Data;
 using UnityEngine;
 
 namespace Gameplay.Model
@@ -8,7 +9,7 @@ namespace Gameplay.Model
         public int CurrentAtk { get; set; }
         public int CurrentDef { get; set; }
         
-        public EnemyCharacter(EnemyCharacterData data) : base(data)
+        public EnemyCharacter(EnemyCharacterData data) : base(data, CombatantType.Enemy)
         {
             CurrentAtk = data.EnemyAttack;
             CurrentDef = data.EnemyDefense;
@@ -18,6 +19,7 @@ namespace Gameplay.Model
         {
             damage -= CurrentDef;
             base.TakeDamage(damage);
+         
         }
 
         public void ModifyAttack(int change) => CurrentAtk = Mathf.Max(0, CurrentAtk + change);

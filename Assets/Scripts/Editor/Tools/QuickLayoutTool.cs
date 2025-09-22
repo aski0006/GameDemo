@@ -17,7 +17,7 @@ public class QuickLayoutTool : EditorWindow
     private Vector3[] previewPositions;
     private Bounds previewBounds;
 
-    [MenuItem("Tools/Quick Layout")]
+    [MenuItem("Tools/快速布局工具")]
     static void Open() => GetWindow<QuickLayoutTool>("Quick Layout");
 
     // 只创建一次 SerializedObject

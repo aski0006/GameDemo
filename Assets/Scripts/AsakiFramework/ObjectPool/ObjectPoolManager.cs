@@ -63,6 +63,12 @@ namespace AsakiFramework.ObjectPool
             }
         }
 
+        #region Editor Frendly 
+        public IReadOnlyDictionary<GameObject, GameObjectPool> GetGameObjectPools() => _gameObjectPools;
+        public IReadOnlyDictionary<Type, Dictionary<GameObject, object>> GetComponentPools() => _componentPools;
+        public IReadOnlyDictionary<string, IObjectPool> GetAllPools() => _pools;
+        #endregion
+        
         #region GameObject Pool Methods
 
         /// <summary>

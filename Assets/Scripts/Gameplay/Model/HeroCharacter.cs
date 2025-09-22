@@ -1,13 +1,13 @@
-﻿using Data;
+﻿using AsakiFramework;
+using Data;
 
 namespace Gameplay.Model
 {
     public class HeroCharacter : CombatantModel
     {
 
-        public HeroCharacter(HeroCharacterData data) : base(data)
-        {
-            
-        }
+        public HeroCharacter(HeroCharacterData data) : base(data, CombatantType.Hero)
+        { }
+
     }
 }

@@ -9,17 +9,19 @@ namespace Gameplay.Controller
         private CombatantModel model;
         private CombatantViewBase view;
 
+        public ulong modelId { get; private set; }
         public CombatantBaseController(CombatantModel model, CombatantViewBase view)
         {
             this.model = model;
             this.view = view;
-
+            modelId = model.CombatantInstanceID;
             view.BindModel(model);
-            // 绑定视图和模型后，刷新视图以显示初始状态
+            view.RefreshView();
         }
 
         public void TakeDamage(float amount)
         {
+            
             model.TakeDamage(amount);
             view.RefreshView();
         }

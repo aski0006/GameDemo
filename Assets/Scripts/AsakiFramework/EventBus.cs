@@ -10,6 +10,7 @@ namespace AsakiFramework
     /// 全局事件总线 - 基于单例的类型安全委托驱动事件系统
     /// 提供可调试、可清理、可扩展的事件管理功能
     /// </summary>
+    [DefaultExecutionOrder(-1001)]
     public class EventBus : Singleton<EventBus>
     {
         #region 内部数据结构

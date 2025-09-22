@@ -9,16 +9,7 @@ namespace Gameplay.View
         [Header("敌人属性")]
         [SerializeField] private TMP_Text attackText;
         [SerializeField] private TMP_Text defenseText;
-
-        /// <summary>
-        /// 外部调用：把 EnemyCharacter 数据绑定到视图
-        /// </summary>
-        public void BindModel(EnemyCharacter model)
-        {
-            base.BindModel(model); // 刷新血条、头像、名字
-            RefreshAtkDef(model.CurrentAtk, model.CurrentDef);
-        }
-
+        
         /// <summary>
         /// 刷新攻击力 / 防御力文本
         /// </summary>

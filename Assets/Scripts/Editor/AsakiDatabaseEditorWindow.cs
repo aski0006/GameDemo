@@ -18,7 +18,7 @@ namespace AsakiFramework.Editor
         #region 窗口配置
         
         private const string WINDOW_TITLE = "Asaki数据库编辑器";
-        private const string WINDOW_MENU_PATH = "AsakiFramework/数据库编辑器";
+        private const string WINDOW_MENU_PATH = "Asaki 框架/数据库编辑器";
         private const string DATABASE_FOLDER = "Assets/Resources/Database";
         private const string DATABASE_FILE_EXTENSION = ".asset";
         
