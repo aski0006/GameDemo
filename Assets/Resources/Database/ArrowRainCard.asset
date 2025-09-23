@@ -12,16 +12,30 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ad72abdcaf5d4d8eb609f213e57bbcfb, type: 3}
   m_Name: ArrowRainCard
   m_EditorClassIdentifier: 
-  cardName: Arrow Rain
-  cardDescription: Attack All Enemies
-  cardCost: 5
-  cardSprite: {fileID: 21300000, guid: 1caee0b93c9421841abe95cd5f5a4e58, type: 3}
-  <cardEffects>k__BackingField:
-  - rid: 6300106492173615177
+  <CardName>k__BackingField: ArrowRain
+  <CardDescription>k__BackingField: Attack All Enemies
+  <CardCost>k__BackingField: 5
+  <CardSprite>k__BackingField: {fileID: 21300000, guid: 1caee0b93c9421841abe95cd5f5a4e58, type: 3}
+  <ManualTargetEffect>k__BackingField:
+    rid: -2
+  <AutoTargetEffects>k__BackingField:
+  - rid: 6300106492173615399
   references:
     version: 2
     RefIds:
-    - rid: 6300106492173615177
-      type: {class: AttackAllEnemyEffect, ns: Gameplay.Effects, asm: Assembly-CSharp}
+    - rid: -2
+      type: {class: , ns: , asm: }
+    - rid: 6300106492173615399
+      type: {class: AutoTargetEffect, ns: Gameplay.Common.Target, asm: Assembly-CSharp}
       data:
-        demage: 20
+        <TargetMode>k__BackingField:
+          rid: 6300106492173615400
+        <Effect>k__BackingField:
+          rid: 6300106492173615401
+    - rid: 6300106492173615400
+      type: {class: AllEnemiesTarget, ns: Gameplay.Common.Target, asm: Assembly-CSharp}
+      data: 
+    - rid: 6300106492173615401
+      type: {class: AttackEnemyEffect, ns: Gameplay.Effects, asm: Assembly-CSharp}
+      data:
+        demage: 100

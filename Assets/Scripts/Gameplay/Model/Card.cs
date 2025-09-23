@@ -1,4 +1,5 @@
-﻿using Data;
+﻿using Gameplay.Data;
+using Gameplay.Common.Target;
 using Gameplay.Effects;
 using System.Collections.Generic;
 using UnityEngine;
@@ -12,8 +13,8 @@ namespace Gameplay.Model
         public string cardDescription => cardData.CardDescription ?? "UnKnown";
         public int cardCost { get; set; }
         public Sprite cardSprite => cardData.CardSprite;
-        
-        public List<Effect> cardEffects => cardData.cardEffects ?? new List<Effect>();
+        public Effect manualTargetEffect => cardData.ManualTargetEffect;
+        public List<AutoTargetEffect> autoTargetEffects => cardData.AutoTargetEffects;
         // TODO : 后续可拓展其他卡牌属性
 
         public Card(CardData data)

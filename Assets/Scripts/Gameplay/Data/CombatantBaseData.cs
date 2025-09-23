@@ -1,6 +1,7 @@
-﻿using UnityEngine;
+﻿using System.Collections.Generic;
+using UnityEngine;
 
-namespace Data
+namespace Gameplay.Data
 {
     public abstract class CombatantBaseData : ScriptableObject
     {
@@ -10,9 +11,13 @@ namespace Data
         protected string combatantName;
         [Header("战斗单位最大血量"), SerializeField]
         protected float combatantMaxHp;
-
+        [Header("战斗单位持有卡牌数据"), SerializeField]
+        protected List<CardData> cardDataList;
+        
         public abstract Sprite CombatantSprite { get; }
         public abstract string CombatantName { get; }
         public abstract float CombatantMaxHp { get; }
+        
+        public abstract List<CardData> CardDataList { get; }
     }
 }

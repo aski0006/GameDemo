@@ -10,22 +10,24 @@ namespace AsakiFramework
     {
         [Header("Asaki 框架脚本")]
         [Header("作者：Asaki")]
-        [Header("详细日志信息启用")]
-        [SerializeField] private bool isVerbose;
+        [Header("启用日志开关，调试时打开，发布版关闭")][SerializeField]
+        private bool isVerbose;
+
         #region 日志方法
-            public bool IsLogEnabled 
-            { 
-                get => isVerbose; 
-                set => isVerbose = value; 
-            }
-            public static void SetAllLogsEnabled(bool enabled)
+
+        public bool IsLogEnabled
+        {
+            get => isVerbose;
+            set => isVerbose = value;
+        }
+        public static void SetAllLogsEnabled(bool enabled)
+        {
+            var allMonos = FindObjectsByType<AsakiMono>(FindObjectsSortMode.InstanceID);
+            foreach (var mono in allMonos)
             {
-                var allMonos = FindObjectsByType<AsakiMono>(FindObjectsSortMode.InstanceID);
-                foreach (var mono in allMonos)
-                {
-                    mono.isVerbose = enabled;
-                }
+                mono.isVerbose = enabled;
             }
+        }
         /* 发布版彻底剔除 */
 #if UNITY_EDITOR
         [System.Diagnostics.Conditional("UNITY_EDITOR")]
@@ -155,6 +157,7 @@ namespace AsakiFramework
         {
             return GetOrAddComponent<T>(FindComponentMode.Scene);
         }
+
         #endregion
 
         #region 常用协程快捷方法
@@ -355,16 +358,16 @@ namespace AsakiFramework
         }
 
 #endregion
-        
+
         #region 自动注册到服务定位器
 
         protected void AutoRegister<TService>(float maxWaitSeconds = 3f) where TService : AsakiMono
         {
             CoroutineUtility.StartCoroutine(AutoRegisterCoroutine<TService>(maxWaitSeconds));
         }
-        
+
         private IEnumerator AutoRegisterCoroutine<TService>(float maxWaitSeconds) where TService : AsakiMono
-        { 
+        {
             float elapsedTime = 0f;
             while (AsakiMonoServiceLocator.Instance == null && elapsedTime < maxWaitSeconds)
             {
@@ -392,7 +395,7 @@ namespace AsakiFramework
                 LogError($"类型不匹配：当前对象不是 {typeof(TService).Name} 类型");
             }
         }
-        
+
         #endregion
 
     }

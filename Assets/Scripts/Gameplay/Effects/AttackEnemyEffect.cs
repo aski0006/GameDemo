@@ -5,13 +5,13 @@ using UnityEngine;
 
 namespace Gameplay.Effects
 {
-    public class DrawCardEffect : Effect
+    public class AttackEnemyEffect : Effect
     {
-        [Header("抽卡数量"), SerializeField] private int drawCount = 1;
+        [Header("伤害值"), SerializeField] private float demage = 10;
 
         public override GameAction GetGameAction(List<CombatantBaseController> targets)
         {
-            return new DrawCardGA(drawCount);
+            return new DealDamageGA(demage, targets);
         }
     }
 }

@@ -1,5 +1,5 @@
 ﻿using AsakiFramework;
-using Data;
+using Gameplay.Data;
 using UnityEngine;
 
 namespace Gameplay.Model

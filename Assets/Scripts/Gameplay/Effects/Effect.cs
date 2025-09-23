@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Gameplay.Controller;
+using System;
+using System.Collections.Generic;
 
 namespace Gameplay.Effects
 {
@@ -8,6 +10,6 @@ namespace Gameplay.Effects
     [Serializable]
     public abstract class Effect
     {
-        public abstract GameAction GetGameAction();
+        public abstract GameAction GetGameAction(List<CombatantBaseController> targets);
     }
 }

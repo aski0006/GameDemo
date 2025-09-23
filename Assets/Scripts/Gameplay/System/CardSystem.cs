@@ -1,8 +1,9 @@
 ﻿using AsakiFramework;
 using AsakiFramework.ObjectPool;
-using Data;
+using Gameplay.Data;
 using DG.Tweening;
 using Extensions;
+using Gameplay.Controller;
 using Gameplay.Creator;
 using Gameplay.GA;
 using Gameplay.View;
@@ -89,9 +90,16 @@ namespace Gameplay.System
             yield return DiscardCard(card); // 视图动画
             UsageCostGA usageCostGa = new UsageCostGA(card.cardCost);
             ActionSystem.Instance.PerformGameAction(usageCostGa); // 扣除费用
-            foreach (var effect in card.cardEffects)
+
+            if (card.manualTargetEffect != null)
             {
-                PerformEffectGA performEffectGa = new PerformEffectGA(effect);
+                PerformEffectGA performEffectGA = new PerformEffectGA(card.manualTargetEffect, new List<CombatantBaseController> { playCardGa.ManualTargetEnemy });
+                playCardGa.AddPerformReaction(performEffectGA);
+            }
+            foreach (var effectWrapper in card.autoTargetEffects)
+            {
+                var targetList = effectWrapper.TargetMode.GetTargets();
+                PerformEffectGA performEffectGa = new PerformEffectGA(effectWrapper.Effect, targetList);
                 playCardGa.AddPerformReaction(performEffectGa);
             }
         }

@@ -20,7 +20,7 @@ namespace Gameplay.System
         private IEnumerator PerformEffectPerformer(PerformEffectGA performEffectGA)
         {
             // 执行效果
-            GameAction gameAction = performEffectGA.Effect.GetGameAction();
+            GameAction gameAction = performEffectGA.Effect.GetGameAction(performEffectGA.Targets);
             if (gameAction == null) yield break;
             performEffectGA.AddPerformReaction(gameAction);
             yield return null;

@@ -14,4 +14,13 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   combatantSprite: {fileID: 21300000, guid: 95839619a92d8384ca9a0e3ad42ba531, type: 3}
   combatantName: Test
-  combatantMaxHp: 50
+  combatantMaxHp: 100
+  cardDataList:
+  - {fileID: 11400000, guid: fc4b108fc548e4448a7991b8a146809d, type: 2}
+  - {fileID: 11400000, guid: fc4b108fc548e4448a7991b8a146809d, type: 2}
+  - {fileID: 11400000, guid: fc4b108fc548e4448a7991b8a146809d, type: 2}
+  - {fileID: 11400000, guid: f50593a5a1f77af40a1873a8a9e4c200, type: 2}
+  - {fileID: 11400000, guid: f50593a5a1f77af40a1873a8a9e4c200, type: 2}
+  - {fileID: 11400000, guid: f50593a5a1f77af40a1873a8a9e4c200, type: 2}
+  - {fileID: 11400000, guid: 705f78ab6d5fe9643a7f68e18e58fdf0, type: 2}
+  - {fileID: 11400000, guid: 705f78ab6d5fe9643a7f68e18e58fdf0, type: 2}

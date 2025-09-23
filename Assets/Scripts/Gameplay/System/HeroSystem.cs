@@ -1,5 +1,5 @@
 ﻿using AsakiFramework;
-using Data;
+using Gameplay.Data;
 using Extensions;
 using Gameplay.Controller;
 using Gameplay.Creator;
@@ -21,10 +21,10 @@ namespace Gameplay.System
         [Header("英雄区域"), SerializeField] private CombatantAreaView heroArea;
 
         private Dictionary<GUID, HeroCharacterController> heroIdToController = new();
-
+        private Dictionary<HeroCharacterView, GUID> heroViewToModle = new();
         #region 创建英雄角色
 
-        public void LoadHeroCharacterModel(List<HeroCharacterData> dataList)
+        public void LoadHeroCharacterModel(List<HeroCharacterData> dataList, Action onComplete = null)
         {
             var handler = new HeroCreatorHandler(this);
             CreateOverFrames(
@@ -33,7 +33,7 @@ namespace Gameplay.System
                 perFrame: 3,
                 maxMillisPerFrame: 8f,
                 onProgress: (cur, total) => LogInfo($"Hero 创建进度 {cur}/{total}"),
-                onComplete: results => LogInfo($"全部 Hero 创建完成，共 {results.Count} 个"));
+                onComplete: results => onComplete?.Invoke());
         }
 
         /// <summary>
@@ -58,6 +58,7 @@ namespace Gameplay.System
                 }
                 var ctrl = new HeroCharacterController(model, view);
                 _owner.heroIdToController.Add(ctrl.modelId, ctrl);
+                _owner.heroViewToModle.Add(view, ctrl.modelId);
                 return ctrl;
             }
 
@@ -73,20 +74,6 @@ namespace Gameplay.System
 
         public List<HeroCharacterController> GetAllHeroControllers() => new List<HeroCharacterController>(heroIdToController.Values);
 
-        public HeroCharacterController GetHeroControllerOrDefault(int idx = 0, bool random = false)
-        {
-            if (heroIdToController.Count == 0)
-            {
-                return null;
-            }
-            if (random)
-            {
-                var ridx = UnityEngine.Random.Range(0, heroIdToController.Count);
-                return heroIdToController.Values.ToList()[ridx];
-            }
-            return heroIdToController.Values.ElementAt(idx);
-        }
-        
         public HeroCharacterController GetHeroControllerById(GUID id)
         {
             if (heroIdToController.TryGetValue(id, out var ctrl))
@@ -96,6 +83,30 @@ namespace Gameplay.System
             LogWarning($"尝试获取不存在的英雄角色 ID: {id}");
             return null;
         }
+        
+        public HeroCharacterController GetHeroControllerByView(HeroCharacterView view)
+        {
+            if (heroViewToModle.TryGetValue(view, out var modelId))
+            {
+                if (heroIdToController.TryGetValue(modelId, out var ctrl))
+                {
+                    return  ctrl;
+                }
+                LogWarning($"英雄角色 ID: {modelId} 不存在");
+                return null;
+            }
+            LogWarning($"尝试获取不存在的英雄角色 View: {view}");
+            return null;
+        }
+        public void RemoveHeroByView(HeroCharacterView view)
+        {
+            var ctrl = GetHeroControllerByView(view);
+            heroArea.Unregister(view);
+            heroCharacterCreator.ReturnHeroCharacterView(view);
+            heroIdToController.Remove(ctrl.modelId);
+            heroViewToModle.Remove(view);
+        }
+
         public void RemoveHeroById(GUID id)
         {
             if (heroIdToController.TryGetValue(id, out var ctrl))
@@ -110,15 +121,8 @@ namespace Gameplay.System
                 LogWarning($"尝试移除不存在的英雄角色 ID: {id}");
             }
         }
-        public void RemoveHeroByView(HeroCharacterView view)
-        {
-            var ctrls = heroIdToController.Values.ToList();
-            var ctrl = ctrls.Find(c => c.GetView<HeroCharacterView>() == view);
-            heroArea.Unregister(view);
-            heroCharacterCreator.ReturnHeroCharacterView(view);
-            heroIdToController.Remove(ctrl.modelId);
-        }
+
         #endregion
-        
+
     }
 }

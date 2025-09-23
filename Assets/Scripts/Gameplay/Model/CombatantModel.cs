@@ -1,6 +1,7 @@
 ﻿using AsakiFramework;
-using Data;
+using Gameplay.Data;
 using System;
+using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
 
@@ -17,13 +18,15 @@ namespace Gameplay.Model
         public Sprite Sprite => combatantBaseData.CombatantSprite;
         public string Name => combatantBaseData.CombatantName ?? "UnKnown";
         public float MaxHp => combatantBaseData.CombatantMaxHp;
+        public List<CardData> HoldCard => combatantBaseData.CardDataList;
         public float CurrentHp { get; set; }
+
         public bool IsDead => CurrentHp <= 0;
 
         protected CombatantType modelType;
 
         public GUID CombatantInstanceID { get; } = GUID.Generate();
-        
+
         public struct CombatantModelDeathEvent
         {
             public CombatantType Type;
@@ -54,7 +57,6 @@ namespace Gameplay.Model
             CurrentHp = MaxHp;
             modelType = type;
         }
-
-
+        
     }
 }

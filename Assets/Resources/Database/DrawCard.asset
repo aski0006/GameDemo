@@ -12,16 +12,30 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ad72abdcaf5d4d8eb609f213e57bbcfb, type: 3}
   m_Name: DrawCard
   m_EditorClassIdentifier: 
-  cardName: Draw Card
-  cardDescription: 'Draw 2 Card '
-  cardCost: 2
-  cardSprite: {fileID: 21300000, guid: 91ba5a7122ec2554f9a85d339946b03e, type: 3}
-  <cardEffects>k__BackingField:
-  - rid: 6300106450631917640
+  <CardName>k__BackingField: Draw Card
+  <CardDescription>k__BackingField: Draw 2 Card
+  <CardCost>k__BackingField: 3
+  <CardSprite>k__BackingField: {fileID: 21300000, guid: 736d4dc24f016614dbea197a12f51797, type: 3}
+  <ManualTargetEffect>k__BackingField:
+    rid: -2
+  <AutoTargetEffects>k__BackingField:
+  - rid: 6300106492173615393
   references:
     version: 2
     RefIds:
-    - rid: 6300106450631917640
+    - rid: -2
+      type: {class: , ns: , asm: }
+    - rid: 6300106492173615393
+      type: {class: AutoTargetEffect, ns: Gameplay.Common.Target, asm: Assembly-CSharp}
+      data:
+        <TargetMode>k__BackingField:
+          rid: 6300106492173615395
+        <Effect>k__BackingField:
+          rid: 6300106492173615394
+    - rid: 6300106492173615394
       type: {class: DrawCardEffect, ns: Gameplay.Effects, asm: Assembly-CSharp}
       data:
         drawCount: 2
+    - rid: 6300106492173615395
+      type: {class: NoneEnemyTarget, ns: Gameplay.Common.Target, asm: Assembly-CSharp}
+      data: 

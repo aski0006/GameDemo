@@ -4,6 +4,7 @@ using Gameplay.GA;
 using Gameplay.System;
 using Gameplay.Utility;
 using Gameplay.Model;
+using Gameplay.UI;
 using System;
 using TMPro;
 using UnityEngine;
@@ -24,7 +25,8 @@ namespace Gameplay.View
         [Header("卡牌交互层"), SerializeField] private LayerMask interactionLayerMask;
         private CardViewHoverSystem cardViewHoverSystem;
         private InteractionSystem interactionSystem;
-        private CostSystem costSystem;
+        private ManualTargetSystem manualTargetSystem;
+        private EnemySystem enemySystem;
 
         //---------------------------------------------------------------
         private Vector3 dragStartPos;
@@ -35,9 +37,10 @@ namespace Gameplay.View
             HasNotNullComponent(cardNameText);
             HasNotNullComponent(cardDescriptionText);
             HasNotNullComponent(cardCostText);
-            cardViewHoverSystem = GetOrAddComponent<CardViewHoverSystem>(FindComponentMode.Scene);
-            interactionSystem = GetOrAddComponent<InteractionSystem>(FindComponentMode.Scene);
-            costSystem = GetOrAddComponent<CostSystem>(FindComponentMode.Scene);
+            cardViewHoverSystem = FromScene<CardViewHoverSystem>();
+            interactionSystem = FromScene<InteractionSystem>();
+            manualTargetSystem = FromScene<ManualTargetSystem>();
+            enemySystem = FromScene<EnemySystem>();
         }
         public Card Card { get; private set; }
         // 视图初始化
@@ -69,18 +72,30 @@ namespace Gameplay.View
         private void OnMouseDown()
         {
             if (interactionSystem.PlayerCanInteract() == false) return;
-            Lock(interactionSystem, () => { interactionSystem.PLayerIsDragging = true; });
-            cardViewHoverSystem.HideHoverCardView();
-            wrapper.SetActive(true);
-            dragStartPos = transform.position;
-            dragStartRot = transform.rotation;
-            transform.rotation = Quaternion.Euler(0, 0, 0);
-            transform.position = MouseUitility.GetMouseWorldPositionInWorldSpace(-1);
+            if (Card.manualTargetEffect != null)
+            {
+
+                LogInfo("手动选取目标");
+                manualTargetSystem.StartTargeting(transform.position);
+            }
+            else
+            {
+                Lock(interactionSystem, () => { interactionSystem.PLayerIsDragging = true; });
+                cardViewHoverSystem.HideHoverCardView();
+                wrapper.SetActive(true);
+                dragStartPos = transform.position;
+                dragStartRot = transform.rotation;
+                transform.rotation = Quaternion.Euler(0, 0, 0);
+                transform.position = MouseUitility.GetMouseWorldPositionInWorldSpace(-1);
+            }
+
         }
 
         private void OnMouseDrag()
         {
             if (interactionSystem.PlayerCanInteract() == false) return;
+
+            if (Card.manualTargetEffect != null) return;
             transform.position = MouseUitility.GetMouseWorldPositionInWorldSpace(-1);
         }
 
@@ -93,19 +108,47 @@ namespace Gameplay.View
                 canPlay = true // 默认允许
             };
             EventBus.Instance.TriggerRef(ref e);
-            if (Physics.Raycast(
-                    transform.position, Vector3.forward,
-                    out RaycastHit hit, 10f, interactionLayerMask) && e.canPlay
-            )
+            LogInfo("尝试使用卡牌 : " + e.canPlay);
+            if (Card.manualTargetEffect != null)
             {
-                DoMouseUpAction(hit);
+                LogInfo("使用手动选取目标效果");
+                var enemyView = manualTargetSystem.EndTargeting(
+                    MouseUitility.GetMouseWorldPositionInWorldSpace(0)
+                );
+                if (enemyView == null)
+                {
+                    return;
+                }
+                if (e.canPlay)
+                {
+                    var ctrl = enemySystem.GetEnemyControllerByView(enemyView);
+                    if (ctrl == null)
+                    {
+                        LogError($"未能通过视图找到敌人控制器：{enemyView.name}，可能尚未注册或已被移除。取消出牌。");
+                        return;
+                    }
+                    PlayCardGA playCardGa = new PlayCardGA(Card, ctrl);
+                    ActionSystem.Instance.PerformGameAction(playCardGa);
+                }
             }
             else
             {
-                transform.position = dragStartPos;
-                transform.rotation = dragStartRot;
+                if (Physics.Raycast(
+                        transform.position, Vector3.forward,
+                        out RaycastHit hit, 10f, interactionLayerMask) && e.canPlay
+                )
+                {
+                    DoMouseUpAction(hit);
+                }
+                else
+                {
+                    EventBus.Instance.Trigger(new CardCostUI.CostInsufficientEvent());
+                    transform.position = dragStartPos;
+                    transform.rotation = dragStartRot;
+                }
+                Lock(interactionSystem, () => { interactionSystem.PLayerIsDragging = false; });
             }
-            Lock(interactionSystem, () => { interactionSystem.PLayerIsDragging = false; });
+
         }
 
         #endregion
