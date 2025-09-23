@@ -14,4 +14,4 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   combatantSprite: {fileID: 21300000, guid: 95839619a92d8384ca9a0e3ad42ba531, type: 3}
   combatantName: Test
-  combatantMaxHp: 99
+  combatantMaxHp: 50

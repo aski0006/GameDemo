@@ -26,8 +26,7 @@ namespace Gameplay.UI
 
         private void OnDisable()
         {
-            if(EventBus.Instance == null) return;
-            EventBus.Instance.Unsubscribe<CostChangedEvent>(UpdateCostTextHandler);
+            EventBus.Instance?.Unsubscribe<CostChangedEvent>(UpdateCostTextHandler);
         }
 
         // 事件处理方法

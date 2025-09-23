@@ -1,7 +1,5 @@
 ﻿using Gameplay.Controller;
-using Gameplay.View;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace Gameplay.GA
 {

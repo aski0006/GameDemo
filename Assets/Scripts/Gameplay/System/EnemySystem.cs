@@ -10,6 +10,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using UnityEditor;
 using UnityEngine;
 
 namespace Gameplay.System
@@ -18,14 +19,15 @@ namespace Gameplay.System
     {
         [Header("敌人角色创建器"), SerializeField] private EnemyCharacterCreator enemyCharacterCreator;
         [Header("敌人插值区域视图"), SerializeField] private CombatantAreaView enemyAreaView;
-        private Dictionary<ulong, EnemyCharacterController> enemyIdToController = new Dictionary<ulong, EnemyCharacterController>();
+        private Dictionary<GUID, EnemyCharacterController> enemyIdToController = new();
         private Queue<EnemyCharacterData> pendingEnemyCreationQueue = new Queue<EnemyCharacterData>();
         private bool isProcessingQueue = false;
         private HeroSystem heroSystem;
 
         private void Awake()
         {
-            heroSystem = GetOrAddComponent<HeroSystem>(FindComponentMode.Scene);
+            heroSystem = FromScene<HeroSystem>();
+            AutoRegister<EnemySystem>();
         }
         private void OnEnable()
         {
@@ -171,8 +173,17 @@ namespace Gameplay.System
         #region 敌人槽位管理
 
         public List<EnemyCharacterController> GetAllEnemyControllers() => new List<EnemyCharacterController>(enemyIdToController.Values);
-
-        public void RemoveEnemyById(ulong enemyId)
+        
+        public EnemyCharacterController GetEnemyControllerById(GUID enemyId)
+        {
+            var ctrl = enemyIdToController.GetValueOrDefault(enemyId);
+            if (ctrl == null)
+            {
+                LogError("无法找到敌人，ID: " + enemyId);
+            }
+            return ctrl;
+        }
+        public void RemoveEnemyById(GUID enemyId)
         {
             var ctrl = enemyIdToController.GetValueOrDefault(enemyId);
             if (ctrl == null)

@@ -36,6 +36,18 @@ namespace AsakiFramework.ObjectPool
             return ObjectPoolManager.Instance.CreateComponentPool<T>(prefab, initialSize, maxSize, poolName);
         }
 
+        public static GameObjectPool Create(ObjectPoolConfig config)
+        {
+            return ObjectPoolManager.Instance.CreateGameObjectPool(config.Prefab,
+                config.InitialCapacity, config.MaxCapacity, config.PoolName);
+        }
+
+        public static ComponentPool<T> Create<T>(ObjectPoolConfig config) where T : Component
+        {
+            return ObjectPoolManager.Instance.CreateComponentPool<T>(config.Prefab,
+                config.InitialCapacity, config.MaxCapacity, config.PoolName);
+        }
+
         /// <summary>
         /// 创建通用对象池
         /// </summary>
@@ -76,7 +88,7 @@ namespace AsakiFramework.ObjectPool
             {
                 pool = ObjectPoolManager.Instance.CreateGameObjectPool(prefab);
             }
-            
+
             return pool?.Get(position, rotation, parent);
         }
 
@@ -108,7 +120,7 @@ namespace AsakiFramework.ObjectPool
             {
                 pool = ObjectPoolManager.Instance.CreateComponentPool<T>(prefab);
             }
-            
+
             return pool?.Get(position, rotation, parent);
         }
 

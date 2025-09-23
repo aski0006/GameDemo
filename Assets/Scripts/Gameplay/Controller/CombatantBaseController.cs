@@ -1,5 +1,6 @@
 ﻿using Gameplay.View;
 using Gameplay.Model;
+using UnityEditor;
 using UnityEngine;
 
 namespace Gameplay.Controller
@@ -9,7 +10,7 @@ namespace Gameplay.Controller
         private CombatantModel model;
         private CombatantViewBase view;
 
-        public ulong modelId { get; private set; }
+        public GUID modelId { get; private set; }
         public CombatantBaseController(CombatantModel model, CombatantViewBase view)
         {
             this.model = model;

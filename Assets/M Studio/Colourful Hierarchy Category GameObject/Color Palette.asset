@@ -23,11 +23,6 @@ MonoBehaviour:
     backgroundColor: {r: 0, g: 0.6152477, b: 1, a: 1}
     textAlignment: 5
     fontStyle: 1
-  - keyChar: '#'
-    textColor: {r: 0, g: 0, b: 0, a: 1}
-    backgroundColor: {r: 0.5058824, g: 0.84705883, b: 0.81960785, a: 1}
-    textAlignment: 4
-    fontStyle: 3
   - keyChar: '@'
     textColor: {r: 1, g: 1, b: 1, a: 1}
     backgroundColor: {r: 0.9496855, g: 0.4799913, b: 0.40316826, a: 1}
@@ -43,8 +38,8 @@ MonoBehaviour:
     backgroundColor: {r: 0.8238993, g: 0.8238993, b: 0.8238993, a: 1}
     textAlignment: 4
     fontStyle: 3
-  - keyChar: '['
-    textColor: {r: 1, g: 1, b: 1, a: 1}
-    backgroundColor: {r: 0.3618158, g: 0.5031446, b: 0.09967953, a: 1}
+  - keyChar: Asaki
+    textColor: {r: 1, g: 0.44968545, b: 0.44968545, a: 1}
+    backgroundColor: {r: 1, g: 1, b: 1, a: 1}
     textAlignment: 4
     fontStyle: 3

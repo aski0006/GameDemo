@@ -1,5 +1,7 @@
 ﻿using AsakiFramework;
 using Data;
+using System;
+using UnityEditor;
 using UnityEngine;
 
 namespace Gameplay.Model
@@ -19,14 +21,13 @@ namespace Gameplay.Model
         public bool IsDead => CurrentHp <= 0;
 
         protected CombatantType modelType;
-        private static ulong _nextID = 1; // 静态字段用于生成唯一ID
-        public ulong CombatantInstanceID { get; } = _nextID++; // 每个实例的唯一ID
-        [RuntimeInitializeOnLoadMethod]
-        static void ResetID() => _nextID = 1; // 重置ID
+
+        public GUID CombatantInstanceID { get; } = GUID.Generate();
+        
         public struct CombatantModelDeathEvent
         {
             public CombatantType Type;
-            public ulong InstanceID; // 谁死亡
+            public GUID InstanceID; // 谁死亡
         }
 
         public virtual void TakeDamage(float damage)

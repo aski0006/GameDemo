@@ -19,7 +19,7 @@ namespace AsakiFramework.Editor
         private float _lastRefreshTime;
         private bool _autoRefresh = true;
 
-        [MenuItem("Tools/Asaki Framework/AsakiMono 日志管理器")]
+        [MenuItem("Tools/AsakiMono 日志管理器")]
         public static void ShowWindow()
         {
             var window = GetWindow<AsakiMonoLogManager>("AsakiMono 日志管理");

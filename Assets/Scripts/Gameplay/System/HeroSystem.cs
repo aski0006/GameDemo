@@ -8,6 +8,7 @@ using Gameplay.Model;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using UnityEditor;
 using UnityEngine;
 
 namespace Gameplay.System
@@ -19,7 +20,7 @@ namespace Gameplay.System
         [SerializeField] private HeroCharacterCreator heroCharacterCreator;
         [Header("英雄区域"), SerializeField] private CombatantAreaView heroArea;
 
-        private Dictionary<ulong, HeroCharacterController> heroIdToController = new();
+        private Dictionary<GUID, HeroCharacterController> heroIdToController = new();
 
         #region 创建英雄角色
 
@@ -76,7 +77,6 @@ namespace Gameplay.System
         {
             if (heroIdToController.Count == 0)
             {
-                LogError("没有可用的英雄角色");
                 return null;
             }
             if (random)
@@ -86,8 +86,17 @@ namespace Gameplay.System
             }
             return heroIdToController.Values.ElementAt(idx);
         }
-
-        public void RemoveHeroById(ulong id)
+        
+        public HeroCharacterController GetHeroControllerById(GUID id)
+        {
+            if (heroIdToController.TryGetValue(id, out var ctrl))
+            {
+                return ctrl;
+            }
+            LogWarning($"尝试获取不存在的英雄角色 ID: {id}");
+            return null;
+        }
+        public void RemoveHeroById(GUID id)
         {
             if (heroIdToController.TryGetValue(id, out var ctrl))
             {
