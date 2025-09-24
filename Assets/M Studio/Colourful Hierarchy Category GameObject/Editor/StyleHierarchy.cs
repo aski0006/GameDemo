@@ -7,7 +7,7 @@ namespace MStudio
     public class StyleHierarchy
     {
         static string[] dataArray;//Find ColorPalette GUID
-        static string path;//Get ColorPalette(ScriptableObject) path
+        static string path;//CreateAttackVfxEffect ColorPalette(ScriptableObject) path
         static ColorPalette colorPalette;
 
         static StyleHierarchy()

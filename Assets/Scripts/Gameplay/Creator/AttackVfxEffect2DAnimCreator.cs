@@ -9,32 +9,43 @@ namespace Gameplay.Creator
     public class AttackVfxEffect2DAnimCreator : AsakiMono
     {
         [Header("攻击特效2D动画对象池配置"), SerializeField] private ObjectPoolConfig objectPoolConfig;
-        public GameObject prefab => objectPoolConfig.Prefab;
         private void Start()
         {
             ObjectPool.Create(objectPoolConfig);
         }
 
-        public GameObject Get(GameObject vfxPrefab, Vector3 position, Quaternion rotation, Transform parent = null)
+        public AttackVfxEffect2DAnim CreateAttackVfxEffect(Vector3 position, Quaternion rotation, Transform parent = null)
         {
-            if (parent == null) parent = transform;
-            var vfxGameObject = ObjectPool.Get(vfxPrefab, position, rotation, parent);
+            if (parent == null)
+            {
+                if (objectPoolConfig.Parent == null)
+                {
+                    parent = transform;
+                }
+                else
+                {
+                    parent = objectPoolConfig.Parent;
+                }
+            }
+            var vfxGameObject = ObjectPool.Get(objectPoolConfig.Prefab, position, rotation, parent);
             if (vfxGameObject == null)
             {
                 LogError("从对象池获取攻击特效2D动画失败");
                 return null;
             }
-            return vfxGameObject;
+            var vfx = vfxGameObject.GetComponent<AttackVfxEffect2DAnim>();
+            if (vfx == null)
+            {
+                LogError("从对象池获取的攻击特效2D动画不包含 AttackVfxEffect2DAnim 组件");
+                ObjectPool.Return(vfxGameObject);
+                return null;
+            }
+            return vfx;
         }
 
-        public void Return(GameObject vfxGameObject)
+        public void ReturnAttackVfxEffect(AttackVfxEffect2DAnim vfx)
         {
-            if (vfxGameObject == null)
-            {
-                LogError("尝试归还一个空的攻击特效2D动画");
-                return;
-            }
-            ObjectPool.Return(vfxGameObject);
+            ObjectPool.Return(vfx.gameObject);
         }
 
     }

@@ -5,15 +5,14 @@ namespace Gameplay.System
 {
     public class InteractionSystem : AsakiMono
     {
-        // 传统拖拽标记（用于普通拖拽）
-        public bool PLayerIsDragging { get; private set; } = false;
 
         // 正在进行手动目标选择的卡（如果为 null 则不在 targeting 模式）
-        private Card targetingCard;
-        public Card TargetingCard => targetingCard;
+        // 传统拖拽标记（用于普通拖拽）
+        public bool PLayerIsDragging { get; private set; }
+        public Card TargetingCard { get; private set; }
 
         // 是否处于手动目标选择模式（拖动的是一张需要手动选择目标的卡）
-        public bool IsTargetingMode => targetingCard != null;
+        public bool IsTargetingMode => TargetingCard != null;
 
         // 普通交互权限（和之前相同，action system 正在运行时不可交互）
         public bool PlayerCanInteract()
@@ -47,14 +46,14 @@ namespace Gameplay.System
         // 启动手动目标选择模式（用于 manual target 卡）
         public void StartManualTargeting(Card card)
         {
-            targetingCard = card;
+            TargetingCard = card;
             // 保持 PLayerIsDragging = false（目标选择不是传统“拖拽”）
         }
 
         // 结束手动目标选择模式
         public void StopManualTargeting()
         {
-            targetingCard = null;
+            TargetingCard = null;
         }
     }
 }

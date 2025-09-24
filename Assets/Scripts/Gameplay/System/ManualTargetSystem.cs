@@ -1,6 +1,6 @@
 ﻿using AsakiFramework;
 using Gameplay.MVC.View;
-using System;
+using Gameplay.View;
 using UnityEngine;
 
 namespace Gameplay.System
@@ -12,14 +12,14 @@ namespace Gameplay.System
         [Header("检测目标最大距离")][SerializeField] private float maxTargetDistance = 10f;
 
         [Header("调试设置")]
-        [SerializeField, Tooltip("开启后会输出调试日志并在 Scene 中绘制射线/Gizmos")] private bool debugMode = false;
-        [SerializeField, Tooltip("调试模式下 Gizmo 显示时长（秒）")] private float debugGizmoDisplayTime = 5f;
+        [SerializeField][Tooltip("开启后会输出调试日志并在 Scene 中绘制射线/Gizmos")] private bool debugMode;
+        [SerializeField][Tooltip("调试模式下 Gizmo 显示时长（秒）")] private float debugGizmoDisplayTime = 5f;
+        private Vector3 gizmoEndPos;
+        private Vector3 gizmoStartPos;
+        private float gizmoTimer;
 
         // Gizmo绘制相关变量
-        private bool showGizmoRay = false;
-        private Vector3 gizmoStartPos;
-        private Vector3 gizmoEndPos;
-        private float gizmoTimer = 0f;
+        private bool showGizmoRay;
 
         private void Awake()
         {
@@ -39,6 +39,35 @@ namespace Gameplay.System
                 }
             }
         }
+
+        // Gizmo 绘制（仅在调试模式下显示）
+        private void OnDrawGizmos()
+        {
+            if (!debugMode) return;
+
+            if (showGizmoRay)
+            {
+                Color originalColor = Gizmos.color;
+                Gizmos.color = Color.red;
+                Gizmos.DrawLine(gizmoStartPos, gizmoEndPos);
+                Gizmos.DrawWireSphere(gizmoStartPos, 0.1f);
+                Gizmos.DrawWireCube(gizmoEndPos, Vector3.one * 0.2f);
+                DrawArrow(gizmoStartPos, gizmoEndPos - gizmoStartPos, 0.5f);
+                Gizmos.color = originalColor;
+            }
+        }
+
+#if UNITY_EDITOR
+        private void OnDrawGizmosSelected()
+        {
+            if (!debugMode) return;
+            if (!showGizmoRay)
+            {
+                Gizmos.color = new Color(1, 0, 0, 0.1f);
+                // 之前的 test 对象已移除，不再绘制相关 Gizmo
+            }
+        }
+#endif
 
         public void StartTargeting(Vector3 startPos)
         {
@@ -94,10 +123,7 @@ namespace Gameplay.System
                     if (debugMode) LogInfo($"[Manual Target System] 选中目标：{view.name}");
                     return view;
                 }
-                else
-                {
-                    if (debugMode) LogInfo($"[Manual Target System] 命中物体 '{hit.collider.name}'，但未在父级找到 EnemyCharacterView。");
-                }
+                if (debugMode) LogInfo($"[Manual Target System] 命中物体 '{hit.collider.name}'，但未在父级找到 EnemyCharacterView。");
             }
             else
             {
@@ -107,23 +133,23 @@ namespace Gameplay.System
             // 仅在调试模式下执行额外诊断，以免影响运行时性能和日志噪声
             if (debugMode)
             {
-                RaycastHit[] hits = Physics.RaycastAll(ray, maxTargetDistance, mask);
+                var hits = Physics.RaycastAll(ray, maxTargetDistance, mask);
                 if (hits.Length > 0)
                 {
                     LogInfo($"[Manual Target System] RaycastAll 命中数量: {hits.Length}");
-                    foreach (var h in hits)
+                    foreach (RaycastHit h in hits)
                     {
                         LogInfo($" - hit: {h.collider.name}, layer={LayerMask.LayerToName(h.collider.gameObject.layer)}, bounds={h.collider.bounds}");
-                        var hv = h.collider.GetComponentInParent<EnemyCharacterView>();
+                        EnemyCharacterView hv = h.collider.GetComponentInParent<EnemyCharacterView>();
                         LogInfo($"   -> GetComponentInParent<EnemyCharacterView>() = {(hv != null ? hv.name : "null")}");
                     }
                 }
 
-                Collider[] nearby = Physics.OverlapSphere(endPos, 0.5f, mask);
+                var nearby = Physics.OverlapSphere(endPos, 0.5f, mask);
                 if (nearby.Length > 0)
                 {
                     LogInfo($"[Manual Target System] OverlapSphere 在 endPos 附近发现 {nearby.Length} 个 collider：");
-                    foreach (var c in nearby)
+                    foreach (Collider c in nearby)
                     {
                         LogInfo($" - nearby collider: {c.name}, enabled={c.enabled}, isTrigger={c.isTrigger}, layer={LayerMask.LayerToName(c.gameObject.layer)}, bounds={c.bounds}");
                     }
@@ -139,23 +165,6 @@ namespace Gameplay.System
             return null;
         }
 
-        // Gizmo 绘制（仅在调试模式下显示）
-        private void OnDrawGizmos()
-        {
-            if (!debugMode) return;
-
-            if (showGizmoRay)
-            {
-                Color originalColor = Gizmos.color;
-                Gizmos.color = Color.red;
-                Gizmos.DrawLine(gizmoStartPos, gizmoEndPos);
-                Gizmos.DrawWireSphere(gizmoStartPos, 0.1f);
-                Gizmos.DrawWireCube(gizmoEndPos, Vector3.one * 0.2f);
-                DrawArrow(gizmoStartPos, gizmoEndPos - gizmoStartPos, 0.5f);
-                Gizmos.color = originalColor;
-            }
-        }
-
         private void DrawArrow(Vector3 pos, Vector3 direction, float arrowHeadLength = 0.25f, float arrowHeadAngle = 20.0f)
         {
             if (direction == Vector3.zero) return;
@@ -165,17 +174,5 @@ namespace Gameplay.System
             Gizmos.DrawRay(pos + direction, right * arrowHeadLength);
             Gizmos.DrawRay(pos + direction, left * arrowHeadLength);
         }
-
-#if UNITY_EDITOR
-        private void OnDrawGizmosSelected()
-        {
-            if (!debugMode) return;
-            if (!showGizmoRay)
-            {
-                Gizmos.color = new Color(1, 0, 0, 0.1f);
-                // 之前的 test 对象已移除，不再绘制相关 Gizmo
-            }
-        }
-#endif
     }
 }

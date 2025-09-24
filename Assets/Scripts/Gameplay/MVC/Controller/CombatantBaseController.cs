@@ -1,7 +1,6 @@
-﻿using Gameplay.MVC.View;
-using Gameplay.MVC.Model;
+﻿using Gameplay.MVC.Model;
+using Gameplay.MVC.View;
 using UnityEditor;
-using UnityEngine;
 
 namespace Gameplay.MVC.Controller
 {

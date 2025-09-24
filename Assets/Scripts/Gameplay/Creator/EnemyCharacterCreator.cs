@@ -20,7 +20,10 @@ namespace Gameplay.Creator
 
         public EnemyCharacterView CreateEnemyCharacterView(Vector3 position, Quaternion rotation, Transform parent = null)
         {
-            if (parent == null) parent = transform;
+            if (!parent)
+            {
+                parent = objectPoolConfig.Parent == null ? transform : objectPoolConfig.Parent;
+            }
             GameObject enemyCharacterViewObj =
                 ObjectPool.Get(objectPoolConfig.Prefab, position, rotation, parent);
             if (enemyCharacterViewObj == null)

@@ -1,8 +1,8 @@
 ﻿using AsakiFramework;
 using Gameplay.Data;
 using Gameplay.GA;
+using Gameplay.MVC.Controller;
 using Gameplay.MVC.Model;
-using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -10,13 +10,13 @@ namespace Gameplay.System
 {
     public class MatchSetupSystem : AsakiMono
     {
-        [Header("英雄数据资产列表"), SerializeField] private List<HeroCharacterData> heroCharacterDataList = new();
-        [Header("敌人角色数据列表"), SerializeField] private List<EnemyCharacterData> enemyCharacterDataList = new();
-        [Header("初始手牌数量"), SerializeField] private int initialHandSize = 8;
+        [Header("英雄数据资产列表")][SerializeField] private List<HeroCharacterData> heroCharacterDataList = new List<HeroCharacterData>();
+        [Header("敌人角色数据列表")][SerializeField] private List<EnemyCharacterData> enemyCharacterDataList = new List<EnemyCharacterData>();
+        [Header("初始手牌数量")][SerializeField] private int initialHandSize = 8;
+        private readonly List<CardData> cardDataList = new List<CardData>();
         private CardSystem cardSystem;
-        private HeroSystem heroSystem;
         private EnemySystem enemySystem;
-        private List<CardData> cardDataList = new();
+        private HeroSystem heroSystem;
         private void Awake()
         {
             cardSystem = FromScene<CardSystem>();
@@ -40,10 +40,10 @@ namespace Gameplay.System
         {
             LogInfo("收集英雄持有的卡牌数据");
             LogInfo($"英雄数量 :{heroSystem.GetAllHeroControllers().Count}");
-            foreach (var hero in heroSystem.GetAllHeroControllers())
+            foreach (HeroCharacterController hero in heroSystem.GetAllHeroControllers())
             {
-                var model = hero.GetModel<HeroCharacter>();
-                List<CardData> holdCardDataList = model.HoldCard;
+                HeroCharacter model = hero.GetModel<HeroCharacter>();
+                var holdCardDataList = model.HoldCard;
                 LogInfo($"收集到的数量 :{holdCardDataList.Capacity}");
                 cardDataList.AddRange(holdCardDataList);
             }

@@ -29,7 +29,7 @@ namespace Gameplay.Anim
                 forceStop();
             };
         }
-
+        
         public void forceStop()
         {
             gameObject.SetActive(false);

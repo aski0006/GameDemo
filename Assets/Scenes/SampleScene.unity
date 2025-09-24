@@ -152,6 +152,7 @@ Transform:
   - {fileID: 413738072}
   - {fileID: 1271003403}
   - {fileID: 1541126028}
+  - {fileID: 780915105}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &64267248
@@ -230,8 +231,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   isVerbose: 0
-  poolConfig:
-    poolName: Card View Pool
+  objectPoolConfig:
+    poolName: DefaultPool
+    parent: {fileID: 0}
     initialCapacity: 10
     maxCapacity: 20
     prefab: {fileID: 4475015205830900354, guid: 7e8234e82c196bb488d0e5f85bd5520f, type: 3}
@@ -503,6 +505,7 @@ MonoBehaviour:
   isVerbose: 0
   objectPoolConfig:
     poolName: Hero View Pool
+    parent: {fileID: 0}
     initialCapacity: 2
     maxCapacity: 4
     prefab: {fileID: 3134512404159628964, guid: 0b9270c509b74844fabac15ddbfee2e4, type: 3}
@@ -1556,6 +1559,57 @@ MonoBehaviour:
   maxTargetDistance: 10
   debugMode: 0
   debugGizmoDisplayTime: 5
+--- !u!1 &780915104
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 780915105}
+  - component: {fileID: 780915106}
+  m_Layer: 0
+  m_Name: Damage Text Creator
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &780915105
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 780915104}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 40928036}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &780915106
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 780915104}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c38cc0281e1243a5bac2a18a8497b5be, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  isVerbose: 0
+  objectPoolConfig:
+    poolName: DefaultPool
+    parent: {fileID: 2114097218}
+    initialCapacity: 10
+    maxCapacity: 100
+    prefab: {fileID: 3594479666979000560, guid: c2c0a0f391130e944ae2e6c170087dc7, type: 3}
 --- !u!1 &875814255
 GameObject:
   m_ObjectHideFlags: 0
@@ -1589,6 +1643,7 @@ RectTransform:
   m_Children:
   - {fileID: 1170137059}
   - {fileID: 1595803201}
+  - {fileID: 2114097218}
   m_Father: {fileID: 519479965}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
@@ -1810,6 +1865,10 @@ MonoBehaviour:
   hoverCardView: {fileID: 3821459412526343721}
   hoverCardOffset: {x: 0, y: 1, z: 0}
   hoverCardScale: 1.5
+  hoverMoveDuration: 0.15
+  hoverScaleDuration: 0.15
+  hoverEase: 27
+  hideDuration: 0.12
 --- !u!1 &1070108430
 GameObject:
   m_ObjectHideFlags: 0
@@ -2143,6 +2202,7 @@ MonoBehaviour:
   isVerbose: 0
   objectPoolConfig:
     poolName: Enemy View Pool
+    parent: {fileID: 0}
     initialCapacity: 5
     maxCapacity: 10
     prefab: {fileID: 1527795245490190035, guid: 52a1e2345be1bfa43ad7450a5bda727d, type: 3}
@@ -2473,6 +2533,7 @@ MonoBehaviour:
   isVerbose: 0
   objectPoolConfig:
     poolName: Attack Hit Vfx Pool
+    parent: {fileID: 0}
     initialCapacity: 10
     maxCapacity: 20
     prefab: {fileID: 3707834089776329326, guid: 6414d9fff15d6e043b31d65931666142, type: 3}
@@ -3168,6 +3229,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   isVerbose: 0
   attackVfxEffect2DAnimCreator: {fileID: 1541126029}
+  damageTextCreator: {fileID: 780915106}
+  vfxDelay: 0.1
+  damageTextDelay: 0.2
+  betweenTargetDelay: 0.1
 --- !u!1 &2061764689
 GameObject:
   m_ObjectHideFlags: 0
@@ -3390,6 +3455,37 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 562532180}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &2114097217
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2114097218}
+  m_Layer: 0
+  m_Name: Damage UI Point
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &2114097218
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2114097217}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 1
+  m_Children: []
+  m_Father: {fileID: 875814256}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!224 &479325567472429142
 RectTransform:

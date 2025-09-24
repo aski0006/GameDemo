@@ -10,7 +10,7 @@ using TMPro;
 using UnityEditor;
 using UnityEngine;
 
-namespace Gameplay.MVC.View
+namespace Gameplay.UI
 {
     public class CardViewer : AsakiMono, IPoolable, IView
     {

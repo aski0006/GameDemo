@@ -1,5 +1,5 @@
 ﻿using Gameplay.MVC.Controller;
-using Gameplay.MVC.View;
+using Gameplay.UI;
 
 namespace Gameplay.GA
 {

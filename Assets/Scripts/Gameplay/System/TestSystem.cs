@@ -1,4 +1,5 @@
 ﻿using AsakiFramework;
+using Gameplay.MVC.Controller;
 using Gameplay.MVC.View;
 using UnityEngine;
 
@@ -6,8 +7,8 @@ namespace Gameplay.System
 {
     public class TestSystem : AsakiMono
     {
-        private HeroSystem heroSystem;
         private EnemySystem enemySystem;
+        private HeroSystem heroSystem;
         private void Awake()
         {
             heroSystem = GetOrAddComponent<HeroSystem>(FindComponentMode.Scene);
@@ -35,14 +36,14 @@ namespace Gameplay.System
             var heroList = heroSystem.GetAllHeroControllers();
             if (heroList.Count > 0)
             {
-                var heroToRemove = heroList[0];
+                HeroCharacterController heroToRemove = heroList[0];
                 heroSystem.RemoveHeroByView(heroToRemove.GetView<HeroCharacterView>()); // 也需要在 HeroSystem 中实现 RemoveHeroByView 方法
             }
 
             var enemyList = enemySystem.GetAllEnemyControllers();
             if (enemyList.Count > 0)
             {
-                var enemyToRemove = enemyList[0];
+                EnemyCharacterController enemyToRemove = enemyList[0];
                 enemySystem.RemoveEnemyByView(enemyToRemove.GetView<EnemyCharacterView>()); // 也需要在 EnemySystem 中实现 RemoveEnemy 方法
             }
 

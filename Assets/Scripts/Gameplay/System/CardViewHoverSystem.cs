@@ -1,30 +1,30 @@
 ﻿using AsakiFramework;
-using Gameplay.MVC.View;
-using Gameplay.MVC.Model;
-using UnityEngine;
 using DG.Tweening;
+using Gameplay.MVC.Model;
+using Gameplay.UI;
 using System;
+using UnityEngine;
 
 namespace Gameplay.System
 {
     public class CardViewHoverSystem : AsakiMono
     {
-        [Header("悬停卡牌视图"), SerializeField] private CardViewer hoverCardView;
-        [Header("悬浮卡牌位置偏移"), SerializeField] private Vector3 hoverCardOffset = new Vector3(0, 2, 0);
-        [Header("悬停卡牌缩放比例"), SerializeField, Min(0.1f)] private float hoverCardScale = 1.5f;
+        [Header("悬停卡牌视图")][SerializeField] private CardViewer hoverCardView;
+        [Header("悬浮卡牌位置偏移")][SerializeField] private Vector3 hoverCardOffset = new Vector3(0, 2, 0);
+        [Header("悬停卡牌缩放比例")][SerializeField][Min(0.1f)] private float hoverCardScale = 1.5f;
 
         [Header("DOTween 设置")]
-        [SerializeField, Min(0f)] private float hoverMoveDuration = 0.15f;
-        [SerializeField, Min(0f)] private float hoverScaleDuration = 0.15f;
+        [SerializeField][Min(0f)] private float hoverMoveDuration = 0.15f;
+        [SerializeField][Min(0f)] private float hoverScaleDuration = 0.15f;
         [SerializeField] private Ease hoverEase = Ease.OutBack;
-        [SerializeField, Min(0f)] private float hideDuration = 0.12f;
+        [SerializeField][Min(0f)] private float hideDuration = 0.12f;
 
         // 用于管理当前播放的 Sequence，方便在新的悬停/隐藏时清理
         private Sequence currentSequence;
 
         /// <summary>
-        /// 显示悬停视图并播放平滑动画。
-        /// position: 通常传入原始卡牌位置（world space），动画将从该位置移动到 position + hoverCardOffset。
+        ///     显示悬停视图并播放平滑动画。
+        ///     position: 通常传入原始卡牌位置（world space），动画将从该位置移动到 position + hoverCardOffset。
         /// </summary>
         public void ShowHoverCardView(Card card, Vector3 position)
         {
@@ -53,7 +53,7 @@ namespace Gameplay.System
         }
 
         /// <summary>
-        /// 隐藏悬停视图，并播放收起动画，动画完成后隐藏视图并解绑模型。
+        ///     隐藏悬停视图，并播放收起动画，动画完成后隐藏视图并解绑模型。
         /// </summary>
         public void HideHoverCardView()
         {

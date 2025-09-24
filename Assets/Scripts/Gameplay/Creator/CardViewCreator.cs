@@ -1,7 +1,7 @@
 ﻿using AsakiFramework;
 using AsakiFramework.ObjectPool;
 using DG.Tweening;
-using Gameplay.MVC.View;
+using Gameplay.UI;
 using Gameplay.MVC.Model;
 using System;
 using UnityEngine;
@@ -10,17 +10,20 @@ namespace Gameplay.Creator
 {
     public class CardViewCreator : AsakiMono
     {
-        [Header("卡牌视图对象池配置"), SerializeField] private ObjectPoolConfig poolConfig;
+        [Header("卡牌视图对象池配置"), SerializeField] private ObjectPoolConfig objectPoolConfig;
 
         private void Start()
         {
-            ObjectPool.Create<CardViewer>(poolConfig.Prefab, poolConfig.InitialCapacity, poolConfig.MaxCapacity, poolConfig.PoolName);
+            ObjectPool.Create<CardViewer>(objectPoolConfig);
         }
 
         public CardViewer CreateCardView(Card card, Vector3 position, Quaternion rotation, Transform parent = null)
         {
-            if (parent == null) parent = transform;
-            GameObject cardViewObj = ObjectPool.Get(poolConfig.Prefab, position, rotation, parent);
+            if (!parent)
+            {
+                parent = objectPoolConfig.Parent == null ? transform : objectPoolConfig.Parent;
+            }
+            GameObject cardViewObj = ObjectPool.Get(objectPoolConfig.Prefab, position, rotation, parent);
             if (cardViewObj == null)
             {
                 LogError("从对象池获取对象失败");

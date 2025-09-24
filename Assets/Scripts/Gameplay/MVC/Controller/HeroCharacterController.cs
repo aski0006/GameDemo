@@ -1,5 +1,5 @@
-﻿using Gameplay.MVC.View;
-using Gameplay.MVC.Model;
+﻿using Gameplay.MVC.Model;
+using Gameplay.MVC.View;
 
 namespace Gameplay.MVC.Controller
 {

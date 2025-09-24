@@ -766,11 +766,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 641ea2f2aaab4e2c93793c71b92e80c4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  isVerbose: 0
+  isVerbose: 1
   combatantWrapper: {fileID: 4149968597145488875}
   combatantRenderer: {fileID: 6848632038295140823}
   combatantName: {fileID: 5853080786338179614}
   hpUI: {fileID: 8364855154503740346}
+  inspectorShakeStrength: 0.25
+  inspectorShakeDuration: 0.35
+  inspectorVibrato: 10
+  inspectorRandomness: 90
+  usePunchInsteadOfShake: 1
+  inspectorFlashColor: {r: 1, g: 0.5, b: 0.5, a: 1}
+  inspectorFlashDuration: 0.12
   attackText: {fileID: 2122942575955119553}
   defenseText: {fileID: 1850220888233960558}
 --- !u!1 &4149968597145488875 stripped

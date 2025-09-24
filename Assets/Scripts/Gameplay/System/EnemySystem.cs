@@ -1,29 +1,29 @@
 ﻿using AsakiFramework;
-using Gameplay.Data;
 using DG.Tweening;
-using Gameplay.MVC.Controller;
 using Gameplay.Creator;
+using Gameplay.Data;
 using Gameplay.GA;
-using Gameplay.MVC.View;
+using Gameplay.MVC.Controller;
 using Gameplay.MVC.Model;
+using Gameplay.MVC.View;
+using Gameplay.View;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEditor;
 using UnityEngine;
-using Random = UnityEngine.Random;
 
 namespace Gameplay.System
 {
     public class EnemySystem : AsakiMono
     {
-        [Header("敌人角色创建器"), SerializeField] private EnemyCharacterCreator enemyCharacterCreator;
-        [Header("敌人插值区域视图"), SerializeField] private CombatantAreaView enemyAreaView;
-        private Dictionary<GUID, EnemyCharacterController> enemyIdToController = new();
-        private Queue<EnemyCharacterData> pendingEnemyCreationQueue = new Queue<EnemyCharacterData>();
-        private bool isProcessingQueue = false;
+        [Header("敌人角色创建器")][SerializeField] private EnemyCharacterCreator enemyCharacterCreator;
+        [Header("敌人插值区域视图")][SerializeField] private CombatantAreaView enemyAreaView;
+        private readonly Dictionary<GUID, EnemyCharacterController> enemyIdToController = new Dictionary<GUID, EnemyCharacterController>();
         private HeroSystem heroSystem;
+        private bool isProcessingQueue;
+        private readonly Queue<EnemyCharacterData> pendingEnemyCreationQueue = new Queue<EnemyCharacterData>();
 
         private void Awake()
         {
@@ -48,7 +48,7 @@ namespace Gameplay.System
         private IEnumerator EnemyTurnPerformer(EnemyTurnGA enemyTurnGa)
         {
             LogInfo("敌人数量: " + enemyIdToController.Count);
-            foreach (var enemy in enemyIdToController.Values)
+            foreach (EnemyCharacterController enemy in enemyIdToController.Values)
             {
                 LogInfo($"{enemy.GetModel<EnemyCharacter>().Name}开始攻击英雄");
                 AttackTargetHeroGA attackTargetHeroGa = new AttackTargetHeroGA(enemy);
@@ -59,14 +59,14 @@ namespace Gameplay.System
 
         private IEnumerator AttackTargetHeroPerformer(AttackTargetHeroGA attackTargetHeroGa)
         {
-            var attacker = attackTargetHeroGa.Attacker;
-            var attackerView = attacker.GetView<EnemyCharacterView>();
+            EnemyCharacterController attacker = attackTargetHeroGa.Attacker;
+            EnemyCharacterView attackerView = attacker.GetView<EnemyCharacterView>();
             Tween tween = attackerView.transform.DOMoveX(attackerView.transform.position.x - 1f, 0.15f);
             yield return tween.WaitForCompletion();
             attackerView.transform.DOMoveX(attackerView.transform.position.x + 1f, 0.25f);
             EnemyCharacter enemy = attacker.GetModel<EnemyCharacter>();
             var copyHerps = new List<CombatantBaseController>(heroSystem.GetAllHeroControllers());
-            var heroController = copyHerps.FirstOrDefault(x => x.GetModel<HeroCharacter>().IsDead == false);
+            CombatantBaseController heroController = copyHerps.FirstOrDefault(x => x.GetModel<HeroCharacter>().IsDead == false);
             if (heroController == null) yield break;
             DealDamageGA dealDamageGa = new DealDamageGA(enemy.CurrentAtk, new List<CombatantBaseController> { heroController });
             attackTargetHeroGa.AddPerformReaction(dealDamageGa);
@@ -77,26 +77,26 @@ namespace Gameplay.System
 
         public void LoadEnemyCharacterModel(List<EnemyCharacterData> dataList, Action onComplete = null)
         {
-            var handler = new EnemyCreatorHandler(this);
+            EnemyCreatorHandler handler = new EnemyCreatorHandler(this);
             CreateOverFrames(
-                source: dataList,
-                handler: handler,
-                perFrame: 3,
-                maxMillisPerFrame: 8f,
-                onProgress: (cur, total) => LogInfo($"Enemy 创建进度 {cur}/{total}"),
-                onComplete: results => onComplete?.Invoke());
+                dataList,
+                handler,
+                3,
+                8f,
+                (cur, total) => LogInfo($"Enemy 创建进度 {cur}/{total}"),
+                results => onComplete?.Invoke());
         }
 
         private sealed class EnemyCreatorHandler : IFrameCreationHandler<EnemyCharacterData, EnemyCharacterController>
         {
-            private EnemySystem _owner;
+            private readonly EnemySystem _owner;
             public EnemyCreatorHandler(EnemySystem owner)
             {
                 _owner = owner;
             }
             public EnemyCharacterController Create(EnemyCharacterData data)
             {
-                var view = _owner.enemyCharacterCreator.CreateEnemyCharacterView(
+                EnemyCharacterView view = _owner.enemyCharacterCreator.CreateEnemyCharacterView(
                     Vector3.zero, Quaternion.identity);
                 if (view == null) return null;
                 if (_owner.enemyAreaView.TryRegister(view) == false)
@@ -114,8 +114,8 @@ namespace Gameplay.System
                     return null;
                 }
 
-                var model = new EnemyCharacter(data);
-                var ctrl = new EnemyCharacterController(model, view);
+                EnemyCharacter model = new EnemyCharacter(data);
+                EnemyCharacterController ctrl = new EnemyCharacterController(model, view);
                 _owner.enemyIdToController.TryAdd(ctrl.modelId, ctrl);
                 _owner.LogInfo("创建敌人 ID" + ctrl.modelId);
                 return ctrl;
@@ -127,7 +127,7 @@ namespace Gameplay.System
         }
 
         /// <summary>
-        /// 处理等待队列中的敌人创建请求
+        ///     处理等待队列中的敌人创建请求
         /// </summary>
         private IEnumerator ProcessPendingEnemyCreationQueue()
         {
@@ -138,15 +138,15 @@ namespace Gameplay.System
                 // 检查是否有空位
                 if (enemyAreaView.HasAvailableSlot())
                 {
-                    var data = pendingEnemyCreationQueue.Dequeue();
+                    EnemyCharacterData data = pendingEnemyCreationQueue.Dequeue();
                     LogInfo($"从队列中创建等待的敌人: {data.name}");
 
                     // 创建敌人
-                    var view = enemyCharacterCreator.CreateEnemyCharacterView(Vector3.zero, Quaternion.identity);
+                    EnemyCharacterView view = enemyCharacterCreator.CreateEnemyCharacterView(Vector3.zero, Quaternion.identity);
                     if (enemyAreaView.TryRegister(view))
                     {
-                        var model = new EnemyCharacter(data);
-                        var ctrl = new EnemyCharacterController(model, view);
+                        EnemyCharacter model = new EnemyCharacter(data);
+                        EnemyCharacterController ctrl = new EnemyCharacterController(model, view);
                         enemyIdToController.TryAdd(ctrl.modelId, ctrl);
                     }
                     else
@@ -171,11 +171,14 @@ namespace Gameplay.System
 
         #region 敌人槽位管理
 
-        public List<EnemyCharacterController> GetAllEnemyControllers() => new List<EnemyCharacterController>(enemyIdToController.Values);
+        public List<EnemyCharacterController> GetAllEnemyControllers()
+        {
+            return new List<EnemyCharacterController>(enemyIdToController.Values);
+        }
 
         public EnemyCharacterController GetEnemyControllerById(GUID enemyId)
         {
-            var ctrl = enemyIdToController.GetValueOrDefault(enemyId);
+            EnemyCharacterController ctrl = enemyIdToController.GetValueOrDefault(enemyId);
             if (ctrl == null)
             {
                 // 仅在传入非默认 GUID 时记录错误，避免对 default(GUID) 的误报
@@ -188,18 +191,18 @@ namespace Gameplay.System
         public EnemyCharacterController GetEnemyControllerByView(EnemyCharacterView view)
         {
             if (view == null) return null;
-            var boundModelId = view.BoundModelInstanceID;
+            GUID boundModelId = view.BoundModelInstanceID;
             return GetEnemyControllerById(boundModelId);
         }
 
         public void RemoveEnemyById(GUID enemyId)
         {
-            var ctrl = enemyIdToController.GetValueOrDefault(enemyId);
+            EnemyCharacterController ctrl = enemyIdToController.GetValueOrDefault(enemyId);
             if (ctrl == null)
             {
                 return;
             }
-            var view = ctrl.GetView<EnemyCharacterView>();
+            EnemyCharacterView view = ctrl.GetView<EnemyCharacterView>();
             enemyAreaView.Unregister(view);
             enemyCharacterCreator.ReturnEnemyCharacterView(view);
             enemyIdToController.Remove(enemyId);
@@ -210,7 +213,7 @@ namespace Gameplay.System
         }
         public void RemoveEnemyByView(EnemyCharacterView view)
         {
-            var ctrl = GetEnemyControllerByView(view);
+            EnemyCharacterController ctrl = GetEnemyControllerByView(view);
             if (ctrl == null)
             {
                 LogError("无法找到敌人，视图: " + view.name);
@@ -229,12 +232,15 @@ namespace Gameplay.System
         }
 
         /// <summary>
-        /// 获取当前等待创建的敌人数量
+        ///     获取当前等待创建的敌人数量
         /// </summary>
-        public int GetPendingEnemyCount() => pendingEnemyCreationQueue.Count;
+        public int GetPendingEnemyCount()
+        {
+            return pendingEnemyCreationQueue.Count;
+        }
 
         /// <summary>
-        /// 清空等待队列
+        ///     清空等待队列
         /// </summary>
         public void ClearPendingQueue()
         {

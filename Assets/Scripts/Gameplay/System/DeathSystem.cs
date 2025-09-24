@@ -1,4 +1,5 @@
 ﻿using AsakiFramework;
+using Gameplay.MVC.Controller;
 using Gameplay.MVC.Interfaces;
 using Gameplay.MVC.Model;
 using Gameplay.MVC.View;
@@ -8,9 +9,9 @@ namespace Gameplay.System
 {
     public class DeathSystem : AsakiMono
     {
+        private EnemySystem enemySystem;
 
         private HeroSystem heroSystem;
-        private EnemySystem enemySystem;
         private void Awake()
         {
             heroSystem = FromScene<HeroSystem>();
@@ -38,21 +39,21 @@ namespace Gameplay.System
         }
         private void HandleHeroDeath(GUID instanceId)
         {
-            var heroCtrl = heroSystem.GetHeroControllerById(instanceId);
+            HeroCharacterController heroCtrl = heroSystem.GetHeroControllerById(instanceId);
             if (heroCtrl == null)
             {
                 LogWarning($"找不到英雄控制器 ID: {instanceId}");
                 return;
             }
-            var heroView = heroCtrl.GetView<HeroCharacterView>();
+            HeroCharacterView heroView = heroCtrl.GetView<HeroCharacterView>();
             if (heroView == null)
             {
                 LogWarning("找不到英雄视图");
                 return;
             }
             heroView.PlayDeathAnimation(
-                duration: 0.5f,
-                onFinish: () =>
+                0.5f,
+                () =>
                 {
                     heroSystem.RemoveHeroById(instanceId);
                 }
@@ -60,21 +61,21 @@ namespace Gameplay.System
         }
         private void HandleEnemyDeath(GUID instanceId)
         {
-            var enemyCtrl = enemySystem.GetEnemyControllerById(instanceId);
+            EnemyCharacterController enemyCtrl = enemySystem.GetEnemyControllerById(instanceId);
             if (enemyCtrl == null)
             {
                 LogWarning($"找不到敌人控制器 ID: {instanceId}");
                 return;
             }
-            var enemyView = enemyCtrl.GetView<EnemyCharacterView>();
+            EnemyCharacterView enemyView = enemyCtrl.GetView<EnemyCharacterView>();
             if (enemyView == null)
             {
                 LogWarning("找不到敌人视图");
                 return;
             }
             enemyView.PlayDeathAnimation(
-                duration: 0.5f,
-                onFinish: () =>
+                0.5f,
+                () =>
                 {
                     enemySystem.RemoveEnemyById(instanceId);
                 }

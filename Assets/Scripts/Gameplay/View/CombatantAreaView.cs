@@ -1,9 +1,10 @@
 ﻿using AsakiFramework;
+using Gameplay.MVC.View;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace Gameplay.MVC.View
+namespace Gameplay.View
 {
     public class CombatantAreaView : AsakiMono
     {

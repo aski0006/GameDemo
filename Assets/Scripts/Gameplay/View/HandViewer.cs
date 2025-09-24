@@ -1,15 +1,14 @@
 ﻿using AsakiFramework;
 using DG.Tweening;
-using Gameplay.System;
 using Gameplay.MVC.Model;
-using System;
+using Gameplay.UI;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.Splines;
 
-namespace Gameplay.MVC.View
+namespace Gameplay.View
 {
     public class HandViewer : AsakiMono
     {

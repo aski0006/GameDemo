@@ -1,8 +1,7 @@
 ﻿using AsakiFramework;
 using AsakiFramework.ObjectPool;
-using Gameplay.MVC.View;
-using System;
 using UnityEngine;
+using Gameplay.MVC.View;
 
 namespace Gameplay.Creator
 {
@@ -22,7 +21,10 @@ namespace Gameplay.Creator
 
         public HeroCharacterView CreateHeroCharacterView(Vector3 position, Quaternion rotation, Transform parent = null)
         {
-            if (parent == null) parent = transform;
+            if (!parent)
+            {
+                parent = objectPoolConfig.Parent == null ? transform : objectPoolConfig.Parent;
+            }
             GameObject heroCharacterViewObj =
                 ObjectPool.Get(objectPoolConfig.Prefab, position, rotation, parent);
             if (heroCharacterViewObj == null)
