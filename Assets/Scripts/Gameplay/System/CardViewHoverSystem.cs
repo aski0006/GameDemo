@@ -26,7 +26,7 @@ namespace Gameplay.System
         ///     显示悬停视图并播放平滑动画。
         ///     position: 通常传入原始卡牌位置（world space），动画将从该位置移动到 position + hoverCardOffset。
         /// </summary>
-        public void ShowHoverCardView(Card card, Vector3 position)
+        public void ShowHoverCardView(CardModel cardModel, Vector3 position)
         {
             if (hoverCardView == null) return;
 
@@ -34,7 +34,7 @@ namespace Gameplay.System
             KillCurrentSequence();
 
             hoverCardView.gameObject.SetActive(true);
-            hoverCardView.BindModel(card);
+            hoverCardView.BindModel(cardModel);
 
             // 初始状态：从卡牌位置弹出，并从比目标略小的 scale 演出（更有“弹出”感）
             Vector3 targetPos = position + hoverCardOffset;

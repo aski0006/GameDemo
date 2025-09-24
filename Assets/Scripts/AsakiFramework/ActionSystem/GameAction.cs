@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using AsakiFramework;
+using System.Collections.Generic;
 
 public abstract class GameAction
 {
@@ -17,6 +18,19 @@ public abstract class GameAction
     {
         PostReactions.Add(reaction);
         return reaction;
+    }
+    
+    public TReaction AddReaction<TReaction>(TReaction reaction, ActionSystem.ReactionTiming timing) where TReaction : GameAction
+    {
+        switch (timing)
+        {
+            case ActionSystem.ReactionTiming.Pre:
+                return AddPreReaction(reaction);
+            case ActionSystem.ReactionTiming.Post:
+                return AddPostReaction(reaction);
+            default:
+                throw new System.NotImplementedException();
+        }
     }
 
     public TReaction AddPerformReaction<TReaction>(TReaction reaction) where TReaction : GameAction

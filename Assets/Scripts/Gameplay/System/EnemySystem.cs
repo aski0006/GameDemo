@@ -50,7 +50,7 @@ namespace Gameplay.System
             LogInfo("敌人数量: " + enemyIdToController.Count);
             foreach (EnemyCharacterController enemy in enemyIdToController.Values)
             {
-                LogInfo($"{enemy.GetModel<EnemyCharacter>().Name}开始攻击英雄");
+                LogInfo($"{enemy.GetModel<EnemyCharacterModel>().Name}开始攻击英雄");
                 AttackTargetHeroGA attackTargetHeroGa = new AttackTargetHeroGA(enemy);
                 enemyTurnGa.AddPerformReaction(attackTargetHeroGa);
             }
@@ -64,9 +64,9 @@ namespace Gameplay.System
             Tween tween = attackerView.transform.DOMoveX(attackerView.transform.position.x - 1f, 0.15f);
             yield return tween.WaitForCompletion();
             attackerView.transform.DOMoveX(attackerView.transform.position.x + 1f, 0.25f);
-            EnemyCharacter enemy = attacker.GetModel<EnemyCharacter>();
+            EnemyCharacterModel enemy = attacker.GetModel<EnemyCharacterModel>();
             var copyHerps = new List<CombatantBaseController>(heroSystem.GetAllHeroControllers());
-            CombatantBaseController heroController = copyHerps.FirstOrDefault(x => x.GetModel<HeroCharacter>().IsDead == false);
+            CombatantBaseController heroController = copyHerps.FirstOrDefault(x => x.GetModel<HeroCharacterModel>().IsDead == false);
             if (heroController == null) yield break;
             DealDamageGA dealDamageGa = new DealDamageGA(enemy.CurrentAtk, new List<CombatantBaseController> { heroController });
             attackTargetHeroGa.AddPerformReaction(dealDamageGa);
@@ -114,7 +114,7 @@ namespace Gameplay.System
                     return null;
                 }
 
-                EnemyCharacter model = new EnemyCharacter(data);
+                EnemyCharacterModel model = new EnemyCharacterModel(data);
                 EnemyCharacterController ctrl = new EnemyCharacterController(model, view);
                 _owner.enemyIdToController.TryAdd(ctrl.modelId, ctrl);
                 _owner.LogInfo("创建敌人 ID" + ctrl.modelId);
@@ -145,7 +145,7 @@ namespace Gameplay.System
                     EnemyCharacterView view = enemyCharacterCreator.CreateEnemyCharacterView(Vector3.zero, Quaternion.identity);
                     if (enemyAreaView.TryRegister(view))
                     {
-                        EnemyCharacter model = new EnemyCharacter(data);
+                        EnemyCharacterModel model = new EnemyCharacterModel(data);
                         EnemyCharacterController ctrl = new EnemyCharacterController(model, view);
                         enemyIdToController.TryAdd(ctrl.modelId, ctrl);
                     }

@@ -8,7 +8,7 @@ using UnityEngine;
 
 namespace Gameplay.MVC.Model
 {
-    public class Card : IModel
+    public class CardModel : IModel
     {
         private CardData cardData;
         
@@ -21,7 +21,7 @@ namespace Gameplay.MVC.Model
         public List<AutoTargetEffect> autoTargetEffects => cardData.AutoTargetEffects;
         // TODO : 后续可拓展其他卡牌属性
 
-        public Card(CardData data)
+        public CardModel(CardData data)
         {
             cardData = data;
             cardCost = data.CardCost;

@@ -6,7 +6,7 @@ namespace Gameplay.MVC.Controller
     public class HeroCharacterController : CombatantBaseController
     {
 
-        public HeroCharacterController(HeroCharacter model, CombatantViewBase view) : base(model, view)
+        public HeroCharacterController(HeroCharacterModel model, CombatantViewBase view) : base(model, view)
         { }
     }
 }

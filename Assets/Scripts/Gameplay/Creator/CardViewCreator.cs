@@ -17,7 +17,7 @@ namespace Gameplay.Creator
             ObjectPool.Create<CardViewer>(objectPoolConfig);
         }
 
-        public CardViewer CreateCardView(Card card, Vector3 position, Quaternion rotation, Transform parent = null)
+        public CardViewer CreateCardView(CardModel cardModel, Vector3 position, Quaternion rotation, Transform parent = null)
         {
             if (!parent)
             {
@@ -37,7 +37,7 @@ namespace Gameplay.Creator
             }
             cardViewObj.transform.localScale = Vector3.zero;
             cardViewObj.transform.DOScale(Vector3.one, 0.15f);
-            cardView.BindModel(card);
+            cardView.BindModel(cardModel);
             return cardView;
         }
         

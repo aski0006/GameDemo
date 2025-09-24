@@ -9,10 +9,10 @@ namespace Gameplay.System
         // 正在进行手动目标选择的卡（如果为 null 则不在 targeting 模式）
         // 传统拖拽标记（用于普通拖拽）
         public bool PLayerIsDragging { get; private set; }
-        public Card TargetingCard { get; private set; }
+        public CardModel TargetingCardModel { get; private set; }
 
         // 是否处于手动目标选择模式（拖动的是一张需要手动选择目标的卡）
-        public bool IsTargetingMode => TargetingCard != null;
+        public bool IsTargetingMode => TargetingCardModel != null;
 
         // 普通交互权限（和之前相同，action system 正在运行时不可交互）
         public bool PlayerCanInteract()
@@ -29,7 +29,7 @@ namespace Gameplay.System
         }
 
         // 启动普通拖拽（返回是否成功）
-        public bool StartDragging(Card card)
+        public bool StartDragging(CardModel cardModel)
         {
             // 如果正在进行 manual targeting，不允许启动普通拖拽
             if (IsTargetingMode) return false;
@@ -44,16 +44,16 @@ namespace Gameplay.System
         }
 
         // 启动手动目标选择模式（用于 manual target 卡）
-        public void StartManualTargeting(Card card)
+        public void StartManualTargeting(CardModel cardModel)
         {
-            TargetingCard = card;
+            TargetingCardModel = cardModel;
             // 保持 PLayerIsDragging = false（目标选择不是传统“拖拽”）
         }
 
         // 结束手动目标选择模式
         public void StopManualTargeting()
         {
-            TargetingCard = null;
+            TargetingCardModel = null;
         }
     }
 }

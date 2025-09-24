@@ -43,17 +43,17 @@ namespace Gameplay.UI
             manualTargetSystem = FromScene<ManualTargetSystem>();
             enemySystem = FromScene<EnemySystem>();
         }
-        public Card Card { get; private set; }
-        public GUID BoundModelInstanceID => Card?.ModelInstanceID ?? default;
+        public CardModel CardModel { get; private set; }
+        public GUID BoundModelInstanceID => CardModel?.ModelInstanceID ?? default;
 
         public void UnbindModel()
         {
-            Card = null;
+            CardModel = null;
         }
         // 视图初始化
-        public void BindModel(Card model)
+        public void BindModel(CardModel model)
         {
-            Card = model;
+            CardModel = model;
             cardRenderer.sprite = model.cardSprite;
             cardNameText.text = model.cardName;
             cardDescriptionText.text = model.cardDescription;
@@ -70,7 +70,7 @@ namespace Gameplay.UI
             // 当处于 Targeting 模式时（玩家在使用一张需要手动选目标的卡），
             // 我们仍然想让目标保持 Hover（以提供视觉提示），同时目标卡本身不可被拖拽。
             wrapper.SetActive(false);
-            cardViewHoverSystem.ShowHoverCardView(Card, transform.position);
+            cardViewHoverSystem.ShowHoverCardView(CardModel, transform.position);
         }
 
         private void OnMouseExit()
@@ -85,11 +85,11 @@ namespace Gameplay.UI
             if (interactionSystem.PlayerCanInteract() == false) return;
 
             // 如果当前卡为手动目标卡，进入 Targeting 模式（不会把 PLayerIsDragging 设为 true）
-            if (Card.manualTargetEffect != null)
+            if (CardModel.manualTargetEffect != null)
             {
                 LogInfo("手动选取目标 - 进入 Targeting 模式");
                 // 标记当前正在进行手动目标选择
-                interactionSystem.StartManualTargeting(Card);
+                interactionSystem.StartManualTargeting(CardModel);
                 // 启动箭头指示（箭头的隐藏在 ManualTargetSystem.EndTargeting 中处理）
                 manualTargetSystem.StartTargeting(transform.position);
             }
@@ -98,7 +98,7 @@ namespace Gameplay.UI
                 // 普通拖拽：如果当前处于 Targeting 模式，不允许启动普通拖拽
                 Lock(interactionSystem, () =>
                 {
-                    var started = interactionSystem.StartDragging(Card);
+                    var started = interactionSystem.StartDragging(CardModel);
                     if (!started)
                     {
                         // 如果因为处于 target 模式而拒绝拖拽，直接返回
@@ -122,7 +122,7 @@ namespace Gameplay.UI
 
             // 如果正在目标选择模式或该卡属于手动目标卡，则禁止拖动更新位置（卡牌不可拖拽）
             if (interactionSystem.IsTargetingMode) return;
-            if (Card.manualTargetEffect != null) return;
+            if (CardModel.manualTargetEffect != null) return;
 
             transform.position = MouseUitility.GetMouseWorldPositionInWorldSpace(-1);
         }
@@ -132,12 +132,12 @@ namespace Gameplay.UI
             if (interactionSystem.PlayerCanInteract() == false) return;
             var e = new CostSystem.TryPlayCardEvent
             {
-                cardCost = Card.cardCost,
+                cardCost = CardModel.cardCost,
                 canPlay = true // 默认允许
             };
             EventBus.Instance.TriggerRef(ref e);
 
-            if (Card.manualTargetEffect != null)
+            if (CardModel.manualTargetEffect != null)
             {
                 // 结束手动目标选择，获取被选中的 EnemyCharacterView（可能为 null）
                 var enemyView = manualTargetSystem.EndTargeting(
@@ -159,7 +159,7 @@ namespace Gameplay.UI
                     {
                         return;
                     }
-                    PlayCardGA playCardGa = new PlayCardGA(Card, ctrl);
+                    PlayCardGA playCardGa = new PlayCardGA(CardModel, ctrl);
                     ActionSystem.Instance.PerformGameAction(playCardGa);
                 }
             }
@@ -190,7 +190,7 @@ namespace Gameplay.UI
         private void DoMouseUpAction(RaycastHit hitInfo)
         {
             //TODO: 根据射线检测到的物体，执行不同的操作
-            PlayCardGA playCardGa = new PlayCardGA(Card);
+            PlayCardGA playCardGa = new PlayCardGA(CardModel);
             ActionSystem.Instance.PerformGameAction(playCardGa);
         }
         public void OnGetFromPool()

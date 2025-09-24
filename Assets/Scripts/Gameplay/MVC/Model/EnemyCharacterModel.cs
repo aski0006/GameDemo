@@ -5,12 +5,12 @@ using UnityEngine;
 
 namespace Gameplay.MVC.Model
 {
-    public class EnemyCharacter : CombatantModel, IEnemyCombatant
+    public class EnemyCharacterModel : CombatantModel, IEnemyCombatant
     {
         public int CurrentAtk { get; set; }
         public int CurrentDef { get; set; }
         
-        public EnemyCharacter(EnemyCharacterData data) : base(data, CombatantType.Enemy)
+        public EnemyCharacterModel(EnemyCharacterData data) : base(data, CombatantType.Enemy)
         {
             CurrentAtk = data.EnemyAttack;
             CurrentDef = data.EnemyDefense;

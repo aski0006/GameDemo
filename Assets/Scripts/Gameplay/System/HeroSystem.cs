@@ -20,6 +20,12 @@ namespace Gameplay.System
         [Header("英雄区域")][SerializeField] private CombatantAreaView heroArea;
 
         private readonly Dictionary<GUID, HeroCharacterController> heroIdToController = new Dictionary<GUID, HeroCharacterController>();
+
+        private void Awake()
+        {
+            AutoRegister<HeroSystem>();
+        }
+
         #region 创建英雄角色
 
         public void LoadHeroCharacterModel(List<HeroCharacterData> dataList, Action onComplete = null)
@@ -47,7 +53,7 @@ namespace Gameplay.System
 
             public HeroCharacterController Create(HeroCharacterData data)
             {
-                HeroCharacter model = new HeroCharacter(data);
+                HeroCharacterModel model = new HeroCharacterModel(data);
                 HeroCharacterView view = _owner.heroCharacterCreator.CreateHeroCharacterView(
                     Vector3.zero, Quaternion.identity);
                 if (view == null) return null;

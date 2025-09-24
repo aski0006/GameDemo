@@ -7,13 +7,15 @@ namespace AsakiFramework
 {
     public class ActionSystem : Singleton<ActionSystem>
     {
+        public enum ReactionTiming { Pre, Post }
+
         /* ========== 订阅缓存 ========== */
-        private readonly Dictionary<Type, List<Action<GameAction>>> _preSubs   = new();
-        private readonly Dictionary<Type, List<Action<GameAction>>> _postSubs  = new();
+        private readonly Dictionary<Type, List<Action<GameAction>>> _preSubs = new();
+        private readonly Dictionary<Type, List<Action<GameAction>>> _postSubs = new();
         private readonly Dictionary<Type, Func<GameAction, IEnumerator>> _perfSubs = new();
 
         /* ========== 重复订阅去重 ========== */
-        private readonly Dictionary<Type, HashSet<Action<GameAction>>> _preSet  = new();
+        private readonly Dictionary<Type, HashSet<Action<GameAction>>> _preSet = new();
         private readonly Dictionary<Type, HashSet<Action<GameAction>>> _postSet = new();
 
         /* ========== 调用栈防死循环 ========== */
@@ -21,7 +23,7 @@ namespace AsakiFramework
 
         /* ========== 调试 & 性能 ========== */
         private int _runningCount;
-        public  bool IsRunning => _runningCount > 0;
+        public bool IsRunning => _runningCount > 0;
 
         public void PerformGameAction(GameAction action, Action onFinish = null)
         {
@@ -30,11 +32,42 @@ namespace AsakiFramework
 
         /* ------------------------------------------------------------------ */
         #region 订阅管理（带去重 + 缓存包装）
+
         public void SubscribePre<T>(Action<T> callback) where T : GameAction => AddUnique<T>(callback, _preSubs, _preSet);
         public void SubscribePost<T>(Action<T> callback) where T : GameAction => AddUnique<T>(callback, _postSubs, _postSet);
+
+        public void SubscribeReaction<T>(Action<T> callback, ReactionTiming t) where T : GameAction
+        {
+            switch (t)
+            {
+                case ReactionTiming.Pre:
+                    SubscribePre(callback);
+                    break;
+                case ReactionTiming.Post:
+                    SubscribePost(callback);
+                    break;
+                default:
+                    throw new System.NotImplementedException();
+            }
+        }
+        
         public void UnsubscribePre<T>(Action<T> callback) where T : GameAction => RemoveUnique<T>(callback, _preSubs, _preSet);
         public void UnsubscribePost<T>(Action<T> callback) where T : GameAction => RemoveUnique<T>(callback, _postSubs, _postSet);
-
+            
+        public void UnsubscribeReaction<T>(Action<T> callback, ReactionTiming t) where T : GameAction
+        {
+            switch (t)
+            {
+                case ReactionTiming.Pre:
+                    UnsubscribePre(callback);
+                    break;
+                case ReactionTiming.Post:
+                    UnsubscribePost(callback);
+                    break;
+                default:
+                    throw new NotImplementedException();
+            }
+        }
         
         public void AttachPerformer<T>(Func<T, IEnumerator> performer) where T : GameAction
         {
@@ -48,8 +81,10 @@ namespace AsakiFramework
         }
         public void ClearAll()
         {
-            _preSubs.Clear();  _preSet.Clear();
-            _postSubs.Clear(); _postSet.Clear();
+            _preSubs.Clear();
+            _preSet.Clear();
+            _postSubs.Clear();
+            _postSet.Clear();
             _perfSubs.Clear();
         }
         private static void AddUnique<T>(Action<T> cb,
@@ -66,7 +101,7 @@ namespace AsakiFramework
             Action<GameAction> wrapped = a => cb((T)a);
             if (set[t].Add(wrapped)) list.Add(wrapped);
         }
-        
+
         private void RemoveUnique<T>(Action<T> cb,
             Dictionary<Type, List<Action<GameAction>>> dic,
             Dictionary<Type, HashSet<Action<GameAction>>> set) where T : GameAction
@@ -79,10 +114,12 @@ namespace AsakiFramework
 
             if (set[t].Remove(wrapped)) list.Remove(wrapped);
         }
+
         #endregion
 
         /* ------------------------------------------------------------------ */
         #region 核心流程
+
         private IEnumerator Flow(GameAction action, Action onFinish)
         {
             if (!_callStack.Add(action.GetType()))
@@ -124,6 +161,7 @@ namespace AsakiFramework
                 foreach (var l in arr) l.Invoke(action);
             }
         }
+
         #endregion
     }
 }

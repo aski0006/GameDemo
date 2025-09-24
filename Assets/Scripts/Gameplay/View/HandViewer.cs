@@ -19,7 +19,7 @@ namespace Gameplay.View
         [Header("卡牌旋转动画参数"), SerializeField] private float cardRotateDuration = 0.25f;
         private readonly List<CardViewer> cards = new();
         
-        public CardViewer GetCardViewByCard(Card card) => cards.Where(cv => cv.Card == card).FirstOrDefault();
+        public CardViewer GetCardViewByCard(CardModel cardModel) => cards.Where(cv => cv.CardModel == cardModel).FirstOrDefault();
         public void AddCardViewToHandView(CardViewer cardView)
         {
             if (cardView == null) return;

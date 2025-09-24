@@ -23,7 +23,7 @@ namespace Gameplay.MVC.View
         public override void RefreshView()
         {
             base.RefreshView();
-            if (boundModel is EnemyCharacter enemy)
+            if (boundModel is EnemyCharacterModel enemy)
                 RefreshAtkDef(enemy.CurrentAtk, enemy.CurrentDef);
         }
     }

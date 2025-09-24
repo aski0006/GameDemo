@@ -26,10 +26,10 @@ namespace Gameplay.System
         [SerializeField] private Transform handMountPoint; // 手牌挂载点
         [Header("卡牌弃牌堆挂载点")]
         [SerializeField] private Transform discardPileMountPoint; // 弃牌堆挂
-        private readonly List<Card> discardPile = new List<Card>(); // 弃牌堆
+        private readonly List<CardModel> discardPile = new List<CardModel>(); // 弃牌堆
 
-        private readonly List<Card> drawPile = new List<Card>(); // 抽牌堆
-        private readonly List<Card> hand = new List<Card>(); // 手牌
+        private readonly List<CardModel> drawPile = new List<CardModel>(); // 抽牌堆
+        private readonly List<CardModel> hand = new List<CardModel>(); // 手牌
         private void OnEnable()
         {
             ActionSystem.Instance.AttachPerformer<DrawCardGA>(DrawCardPerformer);
@@ -52,7 +52,7 @@ namespace Gameplay.System
         {
             foreach (CardData cardData in cards)
             {
-                drawPile.Add(new Card(cardData));
+                drawPile.Add(new CardModel(cardData));
             }
         }
 
@@ -67,12 +67,12 @@ namespace Gameplay.System
                 RefillDeck();
             }
 
-            Card card = drawPile.DrawRandomElement();
-            hand.Add(card);
+            CardModel cardModel = drawPile.DrawRandomElement();
+            hand.Add(cardModel);
             RunNextFrame(() =>
             {
                 CardViewer view = cardViewCreator.CreateCardView(
-                    card,
+                    cardModel,
                     drawPileMountPoint.position,
                     drawPileMountPoint.rotation);
                 handViewer.AddCardViewToHandView(view);
@@ -80,9 +80,9 @@ namespace Gameplay.System
             yield return null;
         }
 
-        private IEnumerator DiscardCard(Card card)
+        private IEnumerator DiscardCard(CardModel cardModel)
         {
-            CardViewer view = handViewer.GetCardViewByCard(card);
+            CardViewer view = handViewer.GetCardViewByCard(cardModel);
             if (view == null) yield break;
 
             view.transform.DOScale(Vector3.zero, 0.15f);
@@ -116,8 +116,8 @@ namespace Gameplay.System
         }
         private IEnumerator DiscardAllCardPerformer(DiscardAllCardGA discardAllCardGa)
         {
-            var handCopy = new List<Card>(hand);
-            foreach (Card card in handCopy)
+            var handCopy = new List<CardModel>(hand);
+            foreach (CardModel card in handCopy)
             {
                 hand.Remove(card); // ✅ 先删数据
                 discardPile.Add(card); // ✅ 再进弃牌堆
@@ -126,21 +126,21 @@ namespace Gameplay.System
         }
         private IEnumerator PlayCardPerformer(PlayCardGA playCardGa)
         {
-            if (playCardGa == null || playCardGa.Card == null) yield break;
-            if (!hand.Contains(playCardGa.Card)) yield break;
-            Card card = playCardGa.Card;
-            hand.Remove(card); // ✅ 先移出手牌
-            discardPile.Add(card); // ✅ 立即进弃牌堆
-            yield return DiscardCard(card); // 视图动画
-            UsageCostGA usageCostGa = new UsageCostGA(card.cardCost);
+            if (playCardGa == null || playCardGa.CardModel == null) yield break;
+            if (!hand.Contains(playCardGa.CardModel)) yield break;
+            CardModel cardModel = playCardGa.CardModel;
+            hand.Remove(cardModel); // ✅ 先移出手牌
+            discardPile.Add(cardModel); // ✅ 立即进弃牌堆
+            yield return DiscardCard(cardModel); // 视图动画
+            UsageCostGA usageCostGa = new UsageCostGA(cardModel.cardCost);
             ActionSystem.Instance.PerformGameAction(usageCostGa); // 扣除费用
 
-            if (card.manualTargetEffect != null)
+            if (cardModel.manualTargetEffect != null)
             {
-                PerformEffectGA performEffectGA = new PerformEffectGA(card.manualTargetEffect, new List<CombatantBaseController> { playCardGa.ManualTargetEnemy });
+                PerformEffectGA performEffectGA = new PerformEffectGA(cardModel.manualTargetEffect, new List<CombatantBaseController> { playCardGa.ManualTargetEnemy });
                 playCardGa.AddPerformReaction(performEffectGA);
             }
-            foreach (AutoTargetEffect effectWrapper in card.autoTargetEffects)
+            foreach (AutoTargetEffect effectWrapper in cardModel.autoTargetEffects)
             {
                 var targetList = effectWrapper.TargetMode.GetTargets();
                 PerformEffectGA performEffectGa = new PerformEffectGA(effectWrapper.Effect, targetList);

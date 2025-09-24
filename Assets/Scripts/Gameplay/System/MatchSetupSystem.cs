@@ -42,7 +42,7 @@ namespace Gameplay.System
             LogInfo($"英雄数量 :{heroSystem.GetAllHeroControllers().Count}");
             foreach (HeroCharacterController hero in heroSystem.GetAllHeroControllers())
             {
-                HeroCharacter model = hero.GetModel<HeroCharacter>();
+                HeroCharacterModel model = hero.GetModel<HeroCharacterModel>();
                 var holdCardDataList = model.HoldCard;
                 LogInfo($"收集到的数量 :{holdCardDataList.Capacity}");
                 cardDataList.AddRange(holdCardDataList);

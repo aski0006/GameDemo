@@ -5,18 +5,18 @@ namespace Gameplay.GA
 {
     public class PlayCardGA : GameAction
     {
-        public Card Card { get; set; }
+        public CardModel CardModel { get; set; }
         public EnemyCharacterController ManualTargetEnemy { get; set; }
-        public PlayCardGA(Card card)
+        public PlayCardGA(CardModel cardModel)
         {
             // 牌不取目标
-            Card = card;
+            CardModel = cardModel;
             ManualTargetEnemy = null;
         }
-        public PlayCardGA(Card card, EnemyCharacterController manualTargetEnemy)
+        public PlayCardGA(CardModel cardModel, EnemyCharacterController manualTargetEnemy)
         {
             // 技能牌有目标
-            Card = card;
+            CardModel = cardModel;
             ManualTargetEnemy = manualTargetEnemy;
         }
     }
