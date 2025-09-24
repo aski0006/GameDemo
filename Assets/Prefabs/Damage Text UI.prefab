@@ -93,8 +93,8 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 28
-  m_fontSizeBase: 28
+  m_fontSize: 48
+  m_fontSizeBase: 48
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
@@ -153,11 +153,8 @@ MonoBehaviour:
   damageText: {fileID: 6648336643966554226}
   damageColor: {r: 1, g: 1, b: 1, a: 1}
   critColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
-  showMoveDistance: 50
-  showDuration: 1
-  showEase: 9
-  showScaleUp: 1.2
-  floatAmplitude: 10
-  floatFrequency: 2
-  hideDuration: 0.5
-  hideEase: 8
+  popUpDuration: 0.3
+  displayDuration: 0.8
+  fadeOutDuration: 0.2
+  scaleMultiplier: 1.5
+  popUpEase: 27

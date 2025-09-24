@@ -458,6 +458,55 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   isVerbose: 0
+--- !u!1 &361071681
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 361071682}
+  - component: {fileID: 361071683}
+  m_Layer: 0
+  m_Name: Damage Effect System
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &361071682
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 361071681}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1326801605}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &361071683
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 361071681}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 69bc18491a894ec3b2cdcc4a2d266880, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  isVerbose: 0
+  attackVfxEffect2DAnimCreator: {fileID: 1541126029}
+  damageTextCreator: {fileID: 780915106}
+  vfxDelay: 0.1
+  damageTextDelay: 0.2
 --- !u!1 &413738071
 GameObject:
   m_ObjectHideFlags: 0
@@ -1804,7 +1853,7 @@ SpriteRenderer:
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: -9999
+  m_SortingOrder: -99
   m_Sprite: {fileID: 21300000, guid: 01038d87bd6612d4796f8ac60995a99b, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
@@ -2297,6 +2346,7 @@ Transform:
   - {fileID: 1144620386}
   - {fileID: 421345381}
   - {fileID: 1973065059}
+  - {fileID: 361071682}
   - {fileID: 351556276}
   - {fileID: 767146480}
   m_Father: {fileID: 0}
@@ -3228,10 +3278,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   isVerbose: 0
-  attackVfxEffect2DAnimCreator: {fileID: 1541126029}
-  damageTextCreator: {fileID: 780915106}
-  vfxDelay: 0.1
-  damageTextDelay: 0.2
   betweenTargetDelay: 0.1
 --- !u!1 &2061764689
 GameObject:

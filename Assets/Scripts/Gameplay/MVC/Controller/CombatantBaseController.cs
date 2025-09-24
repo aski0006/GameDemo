@@ -1,6 +1,9 @@
-﻿using Gameplay.MVC.Model;
+﻿using AsakiFramework;
+using Gameplay.Events;
+using Gameplay.MVC.Model;
 using Gameplay.MVC.View;
 using UnityEditor;
+using UnityEngine;
 
 namespace Gameplay.MVC.Controller
 {
@@ -8,7 +11,6 @@ namespace Gameplay.MVC.Controller
     {
         private CombatantModel model;
         private CombatantViewBase view;
-
         public GUID modelId { get; private set; }
         public CombatantBaseController(CombatantModel model, CombatantViewBase view)
         {
@@ -21,13 +23,35 @@ namespace Gameplay.MVC.Controller
 
         public void TakeDamage(float amount)
         {
-
+            bool isCritical = model.IsCritical();
+            if (isCritical)
+            {
+                amount *= 1.5f;
+            }
             model.TakeDamage(amount);
             view.RefreshView();
-            
+
             if (amount > 0f)
             {
                 view.PlayHitAnimation();
+
+                var vfxEvent = new DamageVfxEvent
+                {
+                    TargetView = view,
+                    DamageAmount = Mathf.FloorToInt(amount),
+                    IsCritical = isCritical,
+                    HitPosition = view.transform.position
+                };
+                EventBus.Instance.Trigger(vfxEvent);
+
+                // 2. 发布伤害数字事件
+                var textEvent = new DamageTextEvent
+                {
+                    WorldPosition = view.transform.position,
+                    DamageAmount = Mathf.FloorToInt(amount),
+                    IsCritical = isCritical
+                };
+                EventBus.Instance.Trigger(textEvent);
             }
         }
 

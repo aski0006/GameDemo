@@ -146,7 +146,7 @@ namespace AsakiFramework.ObjectPool
         /// <param name="obj">要归还的GameObject</param>
         public void ReturnGameObject(GameObject obj)
         {
-            if (obj == null) return;
+            if (!obj) return;
 
             // 尝试找到对应的对象池
             foreach (var pool in _gameObjectPools.Values)

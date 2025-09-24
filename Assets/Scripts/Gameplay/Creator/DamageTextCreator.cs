@@ -34,7 +34,6 @@ namespace Gameplay.Creator
                 ObjectPool.Return(damageTextObj);
                 return null;
             }
-            damageTextView.SetDamageText(damage);
             return damageTextView;
         }
 

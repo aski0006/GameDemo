@@ -46,6 +46,9 @@ namespace Gameplay.MVC.Model
             if (amount <= 0) return; // 治疗量必须大于0
             CurrentHp = Mathf.Min(MaxHp, CurrentHp + amount);
         }
+        
+        // TODO : 简单的暴击判定，可以扩展
+        public bool IsCritical() => Random.Range(0, 100) <= 10; // 10%的概率暴击 
 
         public CombatantModel(CombatantBaseData data, CombatantType type)
         {
