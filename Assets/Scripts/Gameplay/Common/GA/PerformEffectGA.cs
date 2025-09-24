@@ -11,7 +11,7 @@ namespace Gameplay.GA
         public PerformEffectGA(Effect effect, List<CombatantBaseController> targets)
         {
             Effect = effect;
-            Targets = new(targets);
+            Targets = new List<CombatantBaseController>(targets);
         }
     }
 }

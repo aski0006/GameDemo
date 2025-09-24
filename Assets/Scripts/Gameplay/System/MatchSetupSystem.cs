@@ -36,7 +36,7 @@ namespace Gameplay.System
         }
 
         //收集每个加载的英雄持有的卡牌数据资产
-        public void CollectHeroCardData()
+        private void CollectHeroCardData()
         {
             LogInfo("收集英雄持有的卡牌数据");
             LogInfo($"英雄数量 :{heroSystem.GetAllHeroControllers().Count}");
@@ -48,5 +48,7 @@ namespace Gameplay.System
                 cardDataList.AddRange(holdCardDataList);
             }
         }
+
+       
     }
 }

@@ -35,7 +35,6 @@ namespace AsakiFramework
 
         public void SubscribePre<T>(Action<T> callback) where T : GameAction => AddUnique<T>(callback, _preSubs, _preSet);
         public void SubscribePost<T>(Action<T> callback) where T : GameAction => AddUnique<T>(callback, _postSubs, _postSet);
-
         public void SubscribeReaction<T>(Action<T> callback, ReactionTiming t) where T : GameAction
         {
             switch (t)
@@ -50,10 +49,15 @@ namespace AsakiFramework
                     throw new System.NotImplementedException();
             }
         }
+        public void SubscribeReaction(Type actionType, Action<GameAction> callback, ReactionTiming t)
+        {
+            if (actionType == null || callback == null) return;
+            if (t == ReactionTiming.Pre) AddUniqueByType(actionType, callback, _preSubs, _preSet);
+            else AddUniqueByType(actionType, callback, _postSubs, _postSet);
+        }
         
         public void UnsubscribePre<T>(Action<T> callback) where T : GameAction => RemoveUnique<T>(callback, _preSubs, _preSet);
         public void UnsubscribePost<T>(Action<T> callback) where T : GameAction => RemoveUnique<T>(callback, _postSubs, _postSet);
-            
         public void UnsubscribeReaction<T>(Action<T> callback, ReactionTiming t) where T : GameAction
         {
             switch (t)
@@ -68,7 +72,12 @@ namespace AsakiFramework
                     throw new NotImplementedException();
             }
         }
-        
+        public void UnsubscribeReaction(Type actionType, Action<GameAction> callback, ReactionTiming t)
+        {
+            if (actionType == null || callback == null) return;
+            if (t == ReactionTiming.Pre) RemoveUniqueByType(actionType, callback, _preSubs, _preSet);
+            else RemoveUniqueByType(actionType, callback, _postSubs, _postSet);
+        }
         public void AttachPerformer<T>(Func<T, IEnumerator> performer) where T : GameAction
         {
             Func<GameAction, IEnumerator> wrapped = a => performer((T)a);
@@ -115,6 +124,30 @@ namespace AsakiFramework
             if (set[t].Remove(wrapped)) list.Remove(wrapped);
         }
 
+        private static void AddUniqueByType(Type t,
+            Action<GameAction> cb,
+            Dictionary<Type, List<Action<GameAction>>> dic,
+            Dictionary<Type, HashSet<Action<GameAction>>> set)
+        {
+            if (!dic.TryGetValue(t, out var list))
+            {
+                list = new List<Action<GameAction>>();
+                dic[t] = list;
+                set[t] = new HashSet<Action<GameAction>>();
+            }
+            if (set[t].Add(cb)) list.Add(cb);
+        }
+
+        private static void RemoveUniqueByType(Type t,
+            Action<GameAction> cb,
+            Dictionary<Type, List<Action<GameAction>>> dic,
+            Dictionary<Type, HashSet<Action<GameAction>>> set)
+        {
+            if (!dic.TryGetValue(t, out var list)) return;
+            if (set[t].Remove(cb)) list.Remove(cb);
+        }
+
+        
         #endregion
 
         /* ------------------------------------------------------------------ */

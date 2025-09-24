@@ -103,6 +103,13 @@ MonoBehaviour:
   combatantRenderer: {fileID: 7041638942679255456}
   combatantName: {fileID: 8037102568693652073}
   hpUI: {fileID: 5379049147612453837}
+  inspectorShakeStrength: 0.25
+  inspectorShakeDuration: 0.35
+  inspectorVibrato: 10
+  inspectorRandomness: 90
+  usePunchInsteadOfShake: 1
+  inspectorFlashColor: {r: 1, g: 0.5, b: 0.5, a: 1}
+  inspectorFlashDuration: 0.12
 --- !u!114 &5379049147612453837 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 4362619499164390577, guid: 6092d2299696ef548b24972d3de00cf2, type: 3}

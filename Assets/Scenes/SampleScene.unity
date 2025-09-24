@@ -1865,6 +1865,51 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
+--- !u!1 &992811818
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 992811819}
+  - component: {fileID: 992811820}
+  m_Layer: 0
+  m_Name: Collection System
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &992811819
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 992811818}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1326801605}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &992811820
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 992811818}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d12298609c8845da890cc0f5a77d8b4e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  isVerbose: 1
 --- !u!1 &1017720752
 GameObject:
   m_ObjectHideFlags: 0
@@ -2349,6 +2394,7 @@ Transform:
   - {fileID: 361071682}
   - {fileID: 351556276}
   - {fileID: 767146480}
+  - {fileID: 992811819}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1350515039
@@ -2454,6 +2500,8 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 9a2e5d9296a58464ea1455bebdba2757, type: 2}
   - {fileID: 11400000, guid: 9a2e5d9296a58464ea1455bebdba2757, type: 2}
   - {fileID: 11400000, guid: 9a2e5d9296a58464ea1455bebdba2757, type: 2}
+  collectionDataList:
+  - {fileID: 11400000, guid: ae91d2920becd4648a9f4211ff757016, type: 2}
   initialHandSize: 8
 --- !u!1 &1462180420
 GameObject:
