@@ -9,11 +9,10 @@ using Gameplay.UI;
 using TMPro;
 using UnityEditor;
 using UnityEngine;
-using NotImplementedException = System.NotImplementedException;
 
 namespace Gameplay.MVC.View
 {
-    public class CardViewer : AsakiMono,IPoolable ,IView
+    public class CardViewer : AsakiMono, IPoolable, IView
     {
         [Header("卡牌包装器"), SerializeField] private GameObject wrapper;
         [Space]
@@ -65,7 +64,11 @@ namespace Gameplay.MVC.View
 
         private void OnMouseEnter()
         {
+            // 允许 hover 的条件现在由 InteractionSystem 控制：
             if (interactionSystem.PlayerCanHover() == false) return;
+
+            // 当处于 Targeting 模式时（玩家在使用一张需要手动选目标的卡），
+            // 我们仍然想让目标保持 Hover（以提供视觉提示），同时目标卡本身不可被拖拽。
             wrapper.SetActive(false);
             cardViewHoverSystem.ShowHoverCardView(Card, transform.position);
         }
@@ -80,15 +83,30 @@ namespace Gameplay.MVC.View
         private void OnMouseDown()
         {
             if (interactionSystem.PlayerCanInteract() == false) return;
+
+            // 如果当前卡为手动目标卡，进入 Targeting 模式（不会把 PLayerIsDragging 设为 true）
             if (Card.manualTargetEffect != null)
             {
-
-                LogInfo("手动选取目标");
+                LogInfo("手动选取目标 - 进入 Targeting 模式");
+                // 标记当前正在进行手动目标选择
+                interactionSystem.StartManualTargeting(Card);
+                // 启动箭头指示（箭头的隐藏在 ManualTargetSystem.EndTargeting 中处理）
                 manualTargetSystem.StartTargeting(transform.position);
             }
             else
             {
-                Lock(interactionSystem, () => { interactionSystem.PLayerIsDragging = true; });
+                // 普通拖拽：如果当前处于 Targeting 模式，不允许启动普通拖拽
+                Lock(interactionSystem, () =>
+                {
+                    var started = interactionSystem.StartDragging(Card);
+                    if (!started)
+                    {
+                        // 如果因为处于 target 模式而拒绝拖拽，直接返回
+                        return;
+                    }
+                });
+
+                // 隐藏 hover 视图（若存在）
                 cardViewHoverSystem.HideHoverCardView();
                 wrapper.SetActive(true);
                 dragStartPos = transform.position;
@@ -96,14 +114,16 @@ namespace Gameplay.MVC.View
                 transform.rotation = Quaternion.Euler(0, 0, 0);
                 transform.position = MouseUitility.GetMouseWorldPositionInWorldSpace(-1);
             }
-
         }
 
         private void OnMouseDrag()
         {
             if (interactionSystem.PlayerCanInteract() == false) return;
 
+            // 如果正在目标选择模式或该卡属于手动目标卡，则禁止拖动更新位置（卡牌不可拖拽）
+            if (interactionSystem.IsTargetingMode) return;
             if (Card.manualTargetEffect != null) return;
+
             transform.position = MouseUitility.GetMouseWorldPositionInWorldSpace(-1);
         }
 
@@ -116,13 +136,20 @@ namespace Gameplay.MVC.View
                 canPlay = true // 默认允许
             };
             EventBus.Instance.TriggerRef(ref e);
+
             if (Card.manualTargetEffect != null)
             {
+                // 结束手动目标选择，获取被选中的 EnemyCharacterView（可能为 null）
                 var enemyView = manualTargetSystem.EndTargeting(
                     MouseUitility.GetMouseWorldPositionInWorldSpace(0)
                 );
+
+                // 退出 Targeting 模式（不管是否选到目标，都应退出）
+                interactionSystem.StopManualTargeting();
+
                 if (enemyView == null)
                 {
+                    // 没有选中目标，直接返回（不消耗卡）
                     return;
                 }
                 if (e.canPlay)
@@ -138,6 +165,7 @@ namespace Gameplay.MVC.View
             }
             else
             {
+                // 普通放置逻辑（射线检测）
                 if (Physics.Raycast(
                         transform.position, Vector3.forward,
                         out RaycastHit hit, 10f, interactionLayerMask) && e.canPlay
@@ -151,9 +179,10 @@ namespace Gameplay.MVC.View
                     transform.position = dragStartPos;
                     transform.rotation = dragStartRot;
                 }
-                Lock(interactionSystem, () => { interactionSystem.PLayerIsDragging = false; });
-            }
 
+                // 结束普通拖拽
+                Lock(interactionSystem, () => { interactionSystem.StopDragging(); });
+            }
         }
 
         #endregion
@@ -166,14 +195,21 @@ namespace Gameplay.MVC.View
         }
         public void OnGetFromPool()
         {
-            
+            wrapper.SetActive(true);
         }
         public void OnReturnToPool()
         {
             UnbindModel();
+            wrapper.SetActive(false);
+            cardRenderer.sprite = null;
+            cardRenderer.color = Color.white;
+            cardNameText.text = "";
+            cardDescriptionText.text = "";
+            cardCostText.text = "";
+
+
         }
         public void OnDestroyFromPool()
-        {
-        }
+        { }
     }
 }

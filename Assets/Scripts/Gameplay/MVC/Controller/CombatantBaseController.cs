@@ -25,6 +25,11 @@ namespace Gameplay.MVC.Controller
 
             model.TakeDamage(amount);
             view.RefreshView();
+            
+            if (amount > 0f)
+            {
+                view.PlayHitAnimation();
+            }
         }
 
         public void Heal(float amount)
