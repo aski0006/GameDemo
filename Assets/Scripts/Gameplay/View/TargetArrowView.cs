@@ -3,7 +3,7 @@ using Gameplay.Utility;
 using System;
 using UnityEngine;
 
-namespace Gameplay.View
+namespace Gameplay.MVC.View
 {
     public class TargetArrowView : AsakiMono
     {

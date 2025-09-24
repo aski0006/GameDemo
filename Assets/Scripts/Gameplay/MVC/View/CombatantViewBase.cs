@@ -1,16 +1,18 @@
 ﻿using AsakiFramework;
 using AsakiFramework.ObjectPool;
 using DG.Tweening;
+using Gameplay.MVC.Interfaces;
 using Gameplay.UI;
-using Gameplay.Model;
+using Gameplay.MVC.Model;
 using System;
 using System.Collections;
 using TMPro;
+using UnityEditor;
 using UnityEngine;
 
-namespace Gameplay.View
+namespace Gameplay.MVC.View
 {
-    public class CombatantViewBase : AsakiMono, IPoolable
+    public class CombatantViewBase : AsakiMono, IPoolable, IView
     {
         [NotNullComponent, Header("战斗单位包装器"), SerializeField] public GameObject combatantWrapper;
         [NotNullComponent, Header("战斗单位精灵渲染器"), SerializeField] public SpriteRenderer combatantRenderer;
@@ -20,8 +22,12 @@ namespace Gameplay.View
         public Action OnViewShow;
         public Action OnViewHide;
         private Vector3 originalScale;
-
         protected CombatantModel boundModel;
+        public GUID BoundModelInstanceID => boundModel.ModelInstanceID;
+        public void UnbindModel()
+        {
+            boundModel = null;
+        }
         private void Awake()
         {
             HasNotNullComponent(combatantWrapper);
@@ -91,6 +97,7 @@ namespace Gameplay.View
         public void OnReturnToPool()
         {
             combatantWrapper.SetActive(false);
+            UnbindModel();
         }
         public void OnDestroyFromPool()
         { }

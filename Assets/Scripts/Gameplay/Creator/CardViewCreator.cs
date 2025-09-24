@@ -1,8 +1,8 @@
 ﻿using AsakiFramework;
 using AsakiFramework.ObjectPool;
 using DG.Tweening;
-using Gameplay.View;
-using Gameplay.Model;
+using Gameplay.MVC.View;
+using Gameplay.MVC.Model;
 using System;
 using UnityEngine;
 
@@ -34,7 +34,7 @@ namespace Gameplay.Creator
             }
             cardViewObj.transform.localScale = Vector3.zero;
             cardViewObj.transform.DOScale(Vector3.one, 0.15f);
-            cardView.Setup(card);
+            cardView.BindModel(card);
             return cardView;
         }
         

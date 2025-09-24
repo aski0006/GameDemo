@@ -1,4 +1,4 @@
-﻿using Gameplay.Controller;
+﻿using Gameplay.MVC.Controller;
 using Gameplay.Effects;
 using System.Collections.Generic;
 

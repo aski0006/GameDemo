@@ -1,7 +1,7 @@
 ﻿using AsakiFramework;
 using UnityEngine;
 
-namespace Gameplay.View
+namespace Gameplay.MVC.View
 {
     public class BackgroundViewer : AsakiMono
     {

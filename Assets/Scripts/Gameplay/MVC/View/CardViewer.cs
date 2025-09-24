@@ -1,17 +1,19 @@
 ﻿using AsakiFramework;
 using AsakiFramework.ObjectPool;
 using Gameplay.GA;
+using Gameplay.MVC.Interfaces;
 using Gameplay.System;
 using Gameplay.Utility;
-using Gameplay.Model;
+using Gameplay.MVC.Model;
 using Gameplay.UI;
-using System;
 using TMPro;
+using UnityEditor;
 using UnityEngine;
+using NotImplementedException = System.NotImplementedException;
 
-namespace Gameplay.View
+namespace Gameplay.MVC.View
 {
-    public class CardViewer : AsakiMono
+    public class CardViewer : AsakiMono,IPoolable ,IView
     {
         [Header("卡牌包装器"), SerializeField] private GameObject wrapper;
         [Space]
@@ -43,8 +45,14 @@ namespace Gameplay.View
             enemySystem = FromScene<EnemySystem>();
         }
         public Card Card { get; private set; }
+        public GUID BoundModelInstanceID => Card?.ModelInstanceID ?? default;
+
+        public void UnbindModel()
+        {
+            Card = null;
+        }
         // 视图初始化
-        public void Setup(Card model)
+        public void BindModel(Card model)
         {
             Card = model;
             cardRenderer.sprite = model.cardSprite;
@@ -108,10 +116,8 @@ namespace Gameplay.View
                 canPlay = true // 默认允许
             };
             EventBus.Instance.TriggerRef(ref e);
-            LogInfo("尝试使用卡牌 : " + e.canPlay);
             if (Card.manualTargetEffect != null)
             {
-                LogInfo("使用手动选取目标效果");
                 var enemyView = manualTargetSystem.EndTargeting(
                     MouseUitility.GetMouseWorldPositionInWorldSpace(0)
                 );
@@ -124,7 +130,6 @@ namespace Gameplay.View
                     var ctrl = enemySystem.GetEnemyControllerByView(enemyView);
                     if (ctrl == null)
                     {
-                        LogError($"未能通过视图找到敌人控制器：{enemyView.name}，可能尚未注册或已被移除。取消出牌。");
                         return;
                     }
                     PlayCardGA playCardGa = new PlayCardGA(Card, ctrl);
@@ -158,6 +163,17 @@ namespace Gameplay.View
             //TODO: 根据射线检测到的物体，执行不同的操作
             PlayCardGA playCardGa = new PlayCardGA(Card);
             ActionSystem.Instance.PerformGameAction(playCardGa);
+        }
+        public void OnGetFromPool()
+        {
+            
+        }
+        public void OnReturnToPool()
+        {
+            UnbindModel();
+        }
+        public void OnDestroyFromPool()
+        {
         }
     }
 }

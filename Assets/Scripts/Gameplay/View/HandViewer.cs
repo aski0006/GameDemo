@@ -1,7 +1,7 @@
 ﻿using AsakiFramework;
 using DG.Tweening;
 using Gameplay.System;
-using Gameplay.Model;
+using Gameplay.MVC.Model;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -9,7 +9,7 @@ using System.Linq;
 using UnityEngine;
 using UnityEngine.Splines;
 
-namespace Gameplay.View
+namespace Gameplay.MVC.View
 {
     public class HandViewer : AsakiMono
     {

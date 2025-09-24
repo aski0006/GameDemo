@@ -1,10 +1,11 @@
 ﻿using AsakiFramework;
 using Gameplay.Data;
+using Gameplay.MVC.Interfaces;
 using UnityEngine;
 
-namespace Gameplay.Model
+namespace Gameplay.MVC.Model
 {
-    public class EnemyCharacter : CombatantModel
+    public class EnemyCharacter : CombatantModel, IEnemyCombatant
     {
         public int CurrentAtk { get; set; }
         public int CurrentDef { get; set; }

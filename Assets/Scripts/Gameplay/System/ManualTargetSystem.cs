@@ -1,5 +1,5 @@
 ﻿using AsakiFramework;
-using Gameplay.View;
+using Gameplay.MVC.View;
 using System;
 using UnityEngine;
 

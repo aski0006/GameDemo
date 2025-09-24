@@ -1,7 +1,7 @@
-﻿using Gameplay.Model;
+﻿using Gameplay.MVC.Model;
 using UnityEngine;
 
-namespace Gameplay.View
+namespace Gameplay.MVC.View
 {
     public class HeroCharacterView : CombatantViewBase
     { }

@@ -1,4 +1,4 @@
-﻿using Gameplay.Controller;
+﻿using Gameplay.MVC.Controller;
 using System.Collections.Generic;
 
 namespace Gameplay.Common.Target

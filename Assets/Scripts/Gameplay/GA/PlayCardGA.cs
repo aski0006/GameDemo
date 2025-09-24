@@ -1,5 +1,5 @@
-﻿using Gameplay.Controller;
-using Gameplay.Model;
+﻿using Gameplay.MVC.Controller;
+using Gameplay.MVC.Model;
 
 namespace Gameplay.GA
 {

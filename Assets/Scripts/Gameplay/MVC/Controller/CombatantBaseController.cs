@@ -1,9 +1,9 @@
-﻿using Gameplay.View;
-using Gameplay.Model;
+﻿using Gameplay.MVC.View;
+using Gameplay.MVC.Model;
 using UnityEditor;
 using UnityEngine;
 
-namespace Gameplay.Controller
+namespace Gameplay.MVC.Controller
 {
     public class CombatantBaseController
     {
@@ -15,14 +15,14 @@ namespace Gameplay.Controller
         {
             this.model = model;
             this.view = view;
-            modelId = model.CombatantInstanceID;
+            modelId = model.ModelInstanceID;
             view.BindModel(model);
             view.RefreshView();
         }
 
         public void TakeDamage(float amount)
         {
-            
+
             model.TakeDamage(amount);
             view.RefreshView();
         }
@@ -52,5 +52,6 @@ namespace Gameplay.Controller
 
             return null;
         }
+
     }
 }

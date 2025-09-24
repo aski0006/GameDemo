@@ -1,10 +1,10 @@
 ﻿using AsakiFramework;
 using Gameplay.Anim;
-using Gameplay.Controller;
+using Gameplay.MVC.Controller;
 using Gameplay.Creator;
 using Gameplay.GA;
-using Gameplay.Model;
-using Gameplay.View;
+using Gameplay.MVC.Model;
+using Gameplay.MVC.View;
 using System;
 using System.Collections;
 using UnityEngine;

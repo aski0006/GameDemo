@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace Gameplay.View
+namespace Gameplay.MVC.View
 {
     public class CombatantAreaView : AsakiMono
     {

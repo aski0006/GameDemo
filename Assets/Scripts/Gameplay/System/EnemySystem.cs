@@ -1,11 +1,11 @@
 ﻿using AsakiFramework;
 using Gameplay.Data;
 using DG.Tweening;
-using Gameplay.Controller;
+using Gameplay.MVC.Controller;
 using Gameplay.Creator;
 using Gameplay.GA;
-using Gameplay.View;
-using Gameplay.Model;
+using Gameplay.MVC.View;
+using Gameplay.MVC.Model;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -21,7 +21,6 @@ namespace Gameplay.System
         [Header("敌人角色创建器"), SerializeField] private EnemyCharacterCreator enemyCharacterCreator;
         [Header("敌人插值区域视图"), SerializeField] private CombatantAreaView enemyAreaView;
         private Dictionary<GUID, EnemyCharacterController> enemyIdToController = new();
-        private Dictionary<EnemyCharacterView, GUID> enemyViewToModel = new();
         private Queue<EnemyCharacterData> pendingEnemyCreationQueue = new Queue<EnemyCharacterData>();
         private bool isProcessingQueue = false;
         private HeroSystem heroSystem;
@@ -118,7 +117,6 @@ namespace Gameplay.System
                 var model = new EnemyCharacter(data);
                 var ctrl = new EnemyCharacterController(model, view);
                 _owner.enemyIdToController.TryAdd(ctrl.modelId, ctrl);
-                _owner.enemyViewToModel.TryAdd(view, ctrl.modelId);
                 _owner.LogInfo("创建敌人 ID" + ctrl.modelId);
                 return ctrl;
             }
@@ -150,13 +148,9 @@ namespace Gameplay.System
                         var model = new EnemyCharacter(data);
                         var ctrl = new EnemyCharacterController(model, view);
                         enemyIdToController.TryAdd(ctrl.modelId, ctrl);
-                        enemyViewToModel.TryAdd(view, ctrl.modelId);
-                        LogInfo("创建敌人 ID" + ctrl.modelId);
                     }
                     else
                     {
-                        // 如果还是失败，重新放回队列并等待
-                        LogWarning($"创建队列敌人时区域又满了，重新排队: {data.name}");
                         pendingEnemyCreationQueue.Enqueue(data);
                         enemyCharacterCreator.ReturnEnemyCharacterView(view);
                         yield return new WaitForSeconds(0.5f); // 等待一段时间再重试
@@ -194,28 +188,8 @@ namespace Gameplay.System
         public EnemyCharacterController GetEnemyControllerByView(EnemyCharacterView view)
         {
             if (view == null) return null;
-
-            // 1) 优先通过字典直接查找
-            if (enemyViewToModel.TryGetValue(view, out var enemyId))
-            {
-                var ctrl = GetEnemyControllerById(enemyId);
-                if (ctrl != null) return ctrl;
-            }
-
-            // 2) 回退策略：在已存在的控制器集合中逐个比较 view 引用（容错）
-            foreach (var c in enemyIdToController.Values)
-            {
-                try
-                {
-                    var v = c.GetView<EnemyCharacterView>();
-                    if (v == view) return c;
-                }
-                catch { /* 忽略个别控制器异常，继续尝试 */ }
-            }
-
-            // 3) 未找到：输出 warning 而非 error（更温和），返回 null 由调用方处理
-            LogWarning($"通过视图无法找到对应的敌人控制器（视图可能未注册或已移除）：{(view != null ? view.name : "null")}");
-            return null;
+            var boundModelId = view.BoundModelInstanceID;
+            return GetEnemyControllerById(boundModelId);
         }
 
         public void RemoveEnemyById(GUID enemyId)
@@ -223,14 +197,12 @@ namespace Gameplay.System
             var ctrl = enemyIdToController.GetValueOrDefault(enemyId);
             if (ctrl == null)
             {
-                LogError("无法找到敌人，ID: " + enemyId);
                 return;
             }
             var view = ctrl.GetView<EnemyCharacterView>();
             enemyAreaView.Unregister(view);
             enemyCharacterCreator.ReturnEnemyCharacterView(view);
             enemyIdToController.Remove(enemyId);
-            enemyViewToModel.Remove(view);
             if (pendingEnemyCreationQueue.Count > 0 && !isProcessingQueue)
             {
                 StartCoroutine(ProcessPendingEnemyCreationQueue());
@@ -247,7 +219,6 @@ namespace Gameplay.System
             enemyAreaView.Unregister(view);
             enemyCharacterCreator.ReturnEnemyCharacterView(view);
             enemyIdToController.Remove(ctrl.modelId);
-            enemyViewToModel.Remove(view);
 
             // 移除敌人后检查是否有等待创建的敌人
             if (pendingEnemyCreationQueue.Count > 0 && !isProcessingQueue)

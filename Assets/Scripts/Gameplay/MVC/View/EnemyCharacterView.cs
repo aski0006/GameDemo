@@ -1,8 +1,8 @@
 ﻿using TMPro;
 using UnityEngine;
-using Gameplay.Model;
+using Gameplay.MVC.Model;
 
-namespace Gameplay.View
+namespace Gameplay.MVC.View
 {
     public class EnemyCharacterView : CombatantViewBase
     {

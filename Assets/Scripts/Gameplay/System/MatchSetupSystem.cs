@@ -1,7 +1,7 @@
 ﻿using AsakiFramework;
 using Gameplay.Data;
 using Gameplay.GA;
-using Gameplay.Model;
+using Gameplay.MVC.Model;
 using System;
 using System.Collections.Generic;
 using UnityEngine;

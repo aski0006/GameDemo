@@ -1,5 +1,5 @@
 ﻿using AsakiFramework;
-using Gameplay.Controller;
+using Gameplay.MVC.Controller;
 using Gameplay.System;
 using System.Collections.Generic;
 

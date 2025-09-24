@@ -1,8 +1,7 @@
 ﻿using AsakiFramework;
-using Gameplay.Model;
-using Gameplay.View;
-using System;
-using System.Collections;
+using Gameplay.MVC.Interfaces;
+using Gameplay.MVC.Model;
+using Gameplay.MVC.View;
 using UnityEditor;
 
 namespace Gameplay.System

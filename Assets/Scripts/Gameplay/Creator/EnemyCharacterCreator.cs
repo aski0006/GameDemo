@@ -1,6 +1,6 @@
 ﻿using AsakiFramework;
 using AsakiFramework.ObjectPool;
-using Gameplay.View;
+using Gameplay.MVC.View;
 using UnityEngine;
 
 namespace Gameplay.Creator

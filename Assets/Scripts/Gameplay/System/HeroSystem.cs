@@ -1,13 +1,11 @@
 ﻿using AsakiFramework;
 using Gameplay.Data;
-using Extensions;
-using Gameplay.Controller;
+using Gameplay.MVC.Controller;
 using Gameplay.Creator;
-using Gameplay.View;
-using Gameplay.Model;
+using Gameplay.MVC.View;
+using Gameplay.MVC.Model;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using UnityEditor;
 using UnityEngine;
 
@@ -21,7 +19,6 @@ namespace Gameplay.System
         [Header("英雄区域"), SerializeField] private CombatantAreaView heroArea;
 
         private Dictionary<GUID, HeroCharacterController> heroIdToController = new();
-        private Dictionary<HeroCharacterView, GUID> heroViewToModle = new();
         #region 创建英雄角色
 
         public void LoadHeroCharacterModel(List<HeroCharacterData> dataList, Action onComplete = null)
@@ -58,7 +55,6 @@ namespace Gameplay.System
                 }
                 var ctrl = new HeroCharacterController(model, view);
                 _owner.heroIdToController.Add(ctrl.modelId, ctrl);
-                _owner.heroViewToModle.Add(view, ctrl.modelId);
                 return ctrl;
             }
 
@@ -86,25 +82,16 @@ namespace Gameplay.System
         
         public HeroCharacterController GetHeroControllerByView(HeroCharacterView view)
         {
-            if (heroViewToModle.TryGetValue(view, out var modelId))
-            {
-                if (heroIdToController.TryGetValue(modelId, out var ctrl))
-                {
-                    return  ctrl;
-                }
-                LogWarning($"英雄角色 ID: {modelId} 不存在");
-                return null;
-            }
-            LogWarning($"尝试获取不存在的英雄角色 View: {view}");
-            return null;
+            var boundModelId = view.BoundModelInstanceID;
+            return GetHeroControllerById(boundModelId);
         }
+        
         public void RemoveHeroByView(HeroCharacterView view)
         {
             var ctrl = GetHeroControllerByView(view);
             heroArea.Unregister(view);
             heroCharacterCreator.ReturnHeroCharacterView(view);
             heroIdToController.Remove(ctrl.modelId);
-            heroViewToModle.Remove(view);
         }
 
         public void RemoveHeroById(GUID id)
@@ -115,10 +102,6 @@ namespace Gameplay.System
                 heroArea.Unregister(view);
                 heroCharacterCreator.ReturnHeroCharacterView(view);
                 heroIdToController.Remove(id);
-            }
-            else
-            {
-                LogWarning($"尝试移除不存在的英雄角色 ID: {id}");
             }
         }
 

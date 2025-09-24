@@ -1,6 +1,6 @@
 ﻿using AsakiFramework;
-using Gameplay.View;
-using Gameplay.Model;
+using Gameplay.MVC.View;
+using Gameplay.MVC.Model;
 using UnityEngine;
 
 namespace Gameplay.System
@@ -13,7 +13,7 @@ namespace Gameplay.System
         public void ShowHoverCardView(Card card, Vector3 position)
         {
             hoverCardView.gameObject.SetActive(true);
-            hoverCardView.Setup(card);
+            hoverCardView.BindModel(card);
             hoverCardView.transform.position = position + hoverCardOffset;
             hoverCardView.transform.localScale = Vector3.one * hoverCardScale;
         }

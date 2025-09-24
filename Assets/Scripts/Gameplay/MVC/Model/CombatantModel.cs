@@ -1,18 +1,15 @@
 ﻿using AsakiFramework;
 using Gameplay.Data;
-using System;
+using Gameplay.MVC.Interfaces;
 using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
 
-namespace Gameplay.Model
+namespace Gameplay.MVC.Model
 {
-    public enum CombatantType
-    {
-        Hero,
-        Enemy,
-    }
-    public class CombatantModel
+
+
+    public class CombatantModel : ICombatantReadOnly
     {
         private CombatantBaseData combatantBaseData;
         public Sprite Sprite => combatantBaseData.CombatantSprite;
@@ -23,9 +20,8 @@ namespace Gameplay.Model
 
         public bool IsDead => CurrentHp <= 0;
 
-        protected CombatantType modelType;
-
-        public GUID CombatantInstanceID { get; } = GUID.Generate();
+        public CombatantType combatantType { get; set; }
+        public GUID ModelInstanceID { get; } = GUID.Generate();
 
         public struct CombatantModelDeathEvent
         {
@@ -40,7 +36,7 @@ namespace Gameplay.Model
             CurrentHp = Mathf.Max(0, CurrentHp - damage);
             if (IsDead)
             {
-                EventBus.Instance.Trigger(new CombatantModelDeathEvent { Type = modelType, InstanceID = CombatantInstanceID });
+                EventBus.Instance.Trigger(new CombatantModelDeathEvent { Type = combatantType, InstanceID = ModelInstanceID });
             }
         }
 
@@ -55,8 +51,8 @@ namespace Gameplay.Model
         {
             combatantBaseData = data;
             CurrentHp = MaxHp;
-            modelType = type;
+            combatantType = type;
         }
-        
+
     }
 }

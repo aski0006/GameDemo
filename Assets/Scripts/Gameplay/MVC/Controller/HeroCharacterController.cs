@@ -1,7 +1,7 @@
-﻿using Gameplay.View;
-using Gameplay.Model;
+﻿using Gameplay.MVC.View;
+using Gameplay.MVC.Model;
 
-namespace Gameplay.Controller
+namespace Gameplay.MVC.Controller
 {
     public class HeroCharacterController : CombatantBaseController
     {
