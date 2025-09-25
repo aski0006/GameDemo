@@ -25,4 +25,4 @@ MonoBehaviour:
     - rid: 6300106492173615405
       type: {class: AttackEnemyEffect, ns: Gameplay.Effects, asm: Assembly-CSharp}
       data:
-        damage: 10
+        demage: 20

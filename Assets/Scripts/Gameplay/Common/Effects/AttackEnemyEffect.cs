@@ -7,12 +7,11 @@ namespace Gameplay.Effects
 {
     public class AttackEnemyEffect : Effect
     {
-        [Header("伤害值"), SerializeField] private float damage = 10;
+        [Header("伤害值"), SerializeField] private float demage = 10;
 
-        // 接受并把 caster 传入 InjuryHasSourceGA
-        public override GameAction GetGameAction(List<CombatantBaseController> targets, CombatantBaseController caster = null)
+        public override GameAction GetGameAction(List<CombatantBaseController> targets)
         {
-            return new InjuryHasSourceGA(damage, caster, targets);
+            return new DealDamageGA(demage, targets);
         }
     }
 }

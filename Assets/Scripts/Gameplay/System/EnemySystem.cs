@@ -32,6 +32,8 @@ namespace Gameplay.System
         }
         private void OnEnable()
         {
+            if (ActionSystem.Instance == null) LogInfo("ActionSystem.Instance is null, EnemySystem will not attach performers.");
+            LogInfo("开始注册敌人系统的执行者");
             ActionSystem.Instance.AttachPerformer<EnemyTurnGA>(EnemyTurnPerformer);
             ActionSystem.Instance.AttachPerformer<AttackTargetHeroGA>(AttackTargetHeroPerformer);
         }
@@ -64,10 +66,10 @@ namespace Gameplay.System
             attackerView.transform.DOMoveX(attackerView.transform.position.x + 1f, 0.25f);
             EnemyCharacterModel enemy = attacker.GetModel<EnemyCharacterModel>();
             var copyHerps = new List<CombatantBaseController>(heroSystem.GetAllHeroControllers());
-            CombatantBaseController heroController = copyHerps.ElementAt(UnityEngine.Random.Range(0, copyHerps.Count));
+            CombatantBaseController heroController = copyHerps.FirstOrDefault(x => x.GetModel<HeroCharacterModel>().IsDead == false);
             if (heroController == null) yield break;
-            InjuryHasSourceGA injuryHasSourceGa = new InjuryHasSourceGA(enemy.CurrentAtk, attacker, new List<CombatantBaseController> { heroController });
-            attackTargetHeroGa.AddPerformReaction(injuryHasSourceGa);
+            DealDamageGA dealDamageGa = new DealDamageGA(enemy.CurrentAtk, new List<CombatantBaseController> { heroController });
+            attackTargetHeroGa.AddPerformReaction(dealDamageGa);
         }
 
 
