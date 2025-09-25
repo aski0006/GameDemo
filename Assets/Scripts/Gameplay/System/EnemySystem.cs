@@ -66,9 +66,9 @@ namespace Gameplay.System
             attackerView.transform.DOMoveX(attackerView.transform.position.x + 1f, 0.25f);
             EnemyCharacterModel enemy = attacker.GetModel<EnemyCharacterModel>();
             var copyHerps = new List<CombatantBaseController>(heroSystem.GetAllHeroControllers());
-            CombatantBaseController heroController = copyHerps.FirstOrDefault(x => x.GetModel<HeroCharacterModel>().IsDead == false);
+            CombatantBaseController heroController = copyHerps.ElementAt(UnityEngine.Random.Range(0, copyHerps.Count));
             if (heroController == null) yield break;
-            DealDamageGA dealDamageGa = new DealDamageGA(enemy.CurrentAtk, new List<CombatantBaseController> { heroController });
+            DealDamageGA dealDamageGa = new DealDamageGA(enemy.CurrentAtk, new List<CombatantBaseController> { heroController }, attacker);
             attackTargetHeroGa.AddPerformReaction(dealDamageGa);
         }
 

@@ -17,12 +17,12 @@ MonoBehaviour:
   <CardCost>k__BackingField: 3
   <CardSprite>k__BackingField: {fileID: 21300000, guid: a6cd4c5912420924989b2ee0ad8f4547, type: 3}
   <ManualTargetEffect>k__BackingField:
-    rid: 6300106492173615405
+    rid: 6300106539130683466
   <AutoTargetEffects>k__BackingField: []
   references:
     version: 2
     RefIds:
-    - rid: 6300106492173615405
-      type: {class: AttackEnemyEffect, ns: Gameplay.Effects, asm: Assembly-CSharp}
+    - rid: 6300106539130683466
+      type: {class: DealDamageEffect, ns: Gameplay.Effects, asm: Assembly-CSharp}
       data:
-        demage: 20
+        demage: 10

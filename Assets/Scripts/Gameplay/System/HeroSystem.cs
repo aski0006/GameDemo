@@ -59,7 +59,7 @@ namespace Gameplay.System
                 if (view == null) return null;
                 if (_owner.heroArea.TryRegister(view) == false)
                 {
-                    // 英雄区域已满
+                    _owner.LogError($"英雄区域已满，英雄：{data.name}");
                     _owner.heroCharacterCreator.ReturnHeroCharacterView(view);
                     return null;
                 }

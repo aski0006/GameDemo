@@ -79,7 +79,7 @@ namespace AsakiFramework
 
         /// <summary>
         /// 获取或添加组件。
-        /// mode = Self   :  本 GameObject 上找，找不到就 Add。
+        /// mode = Self   :  本 GameObject 上找，找不到就 OnAdd。
         /// mode = Parent :  在父级链上找，找不到返回 null（不会自动添加）。
         /// mode = Children: 在子级链上找，找不到返回 null（不会自动添加）。
         /// mode = Scene  :  在整个场景里找第一个，找不到返回 null（不会自动添加）。

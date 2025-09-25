@@ -31,11 +31,11 @@ MonoBehaviour:
         <TargetMode>k__BackingField:
           rid: 6300106492173615400
         <Effect>k__BackingField:
-          rid: 6300106492173615401
+          rid: 6300106539130683467
     - rid: 6300106492173615400
       type: {class: AllEnemiesTarget, ns: Gameplay.Common.Target, asm: Assembly-CSharp}
       data: 
-    - rid: 6300106492173615401
-      type: {class: AttackEnemyEffect, ns: Gameplay.Effects, asm: Assembly-CSharp}
+    - rid: 6300106539130683467
+      type: {class: DealDamageEffect, ns: Gameplay.Effects, asm: Assembly-CSharp}
       data:
-        demage: 100
+        demage: 10

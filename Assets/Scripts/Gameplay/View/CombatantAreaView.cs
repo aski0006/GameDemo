@@ -46,12 +46,19 @@ namespace Gameplay.View
         /* ---------------------------------------------------------- */
         public bool TryRegister(CombatantViewBase view)
         {
-            if (view == null) return false;
+            if (view == null)
+            {
+                LogInfo("尝试注册 null 的 view");
+                return false;
+            }
 
             // 已注册则直接返回
             foreach (var s in slots)
                 if (s.Occupant == view)
+                {
+                    LogInfo("已注册的 view");
                     return true;
+                }
 
             if (freeIndexQueue.Count == 0) return false;
 

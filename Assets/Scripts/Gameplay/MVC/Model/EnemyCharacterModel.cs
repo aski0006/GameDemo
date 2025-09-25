@@ -7,13 +7,23 @@ namespace Gameplay.MVC.Model
 {
     public class EnemyCharacterModel : CombatantModel, IEnemyCombatant
     {
+        private EnemyCharacterData enemyData;
         public int CurrentAtk { get; set; }
         public int CurrentDef { get; set; }
         
-        public EnemyCharacterModel(EnemyCharacterData data) : base(data, CombatantType.Enemy)
+        public EnemyCharacterModel() { } // 允许创建空的模型，后续再绑定数据
+        
+        public EnemyCharacterModel(EnemyCharacterData data) 
         {
-            CurrentAtk = data.EnemyAttack;
-            CurrentDef = data.EnemyDefense;
+            BindData(data);
+        }
+
+        public void BindData(EnemyCharacterData data)
+        {
+            enemyData = data;
+            base.BindData(data, CombatantType.Enemy);
+            CurrentAtk = data != null ? data.EnemyAttack : 0;
+            CurrentDef = data != null ? data.EnemyDefense : 0;
         }
 
         public override void TakeDamage(float damage)

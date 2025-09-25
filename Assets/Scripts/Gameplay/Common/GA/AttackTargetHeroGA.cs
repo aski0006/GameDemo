@@ -1,10 +1,11 @@
-﻿using Gameplay.MVC.Controller;
+﻿using Gameplay.Interfaces;
+using Gameplay.MVC.Controller;
 using Gameplay.MVC.Interfaces;
 using Gameplay.UI;
 
 namespace Gameplay.GA
 {
-    public class AttackTargetHeroGA : GameAction
+    public class AttackTargetHeroGA : GameAction, IHasCaster
     {
         public EnemyCharacterController Attacker { get; set; }
 
@@ -12,8 +13,10 @@ namespace Gameplay.GA
         public AttackTargetHeroGA(EnemyCharacterController attacker)
         {
             Attacker = attacker;
+            Caster = attacker;
         }
 
 
+        public CombatantBaseController Caster { get; }
     }
 }

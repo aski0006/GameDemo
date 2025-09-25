@@ -30,7 +30,8 @@ public class ActionSystemDebuggerWindow : EditorWindow
     private FieldInfo fi_preSubs;
     private FieldInfo fi_postSubs;
     private FieldInfo fi_perfSubs;
-    private FieldInfo fi_callStack;
+    private FieldInfo fi_callStack; // old HashSet
+    private FieldInfo fi_callStackList; // new ordered list
     private FieldInfo fi_runningCount;
     private PropertyInfo pi_isRunning;
 
@@ -169,7 +170,19 @@ public class ActionSystemDebuggerWindow : EditorWindow
                 }
             }
 
-            if (fi_callStack != null)
+            // 优先尝试读取 _callStackList（有序），fallback 到旧的 _callStack（无序）
+            if (fi_callStackList != null)
+            {
+                var rawList = fi_callStackList.GetValue(instance) as IList;
+                if (rawList != null)
+                {
+                    foreach (var v in rawList)
+                    {
+                        if (v is Type tt) callStackSnapshot.Add(tt);
+                    }
+                }
+            }
+            else if (fi_callStack != null)
             {
                 var raw = fi_callStack.GetValue(instance) as ICollection;
                 if (raw != null)
@@ -211,6 +224,7 @@ public class ActionSystemDebuggerWindow : EditorWindow
                 var idx = condition.IndexOf("：");
                 if (idx >= 0 && idx < condition.Length - 1)
                     extracted = condition.Substring(idx + 1).Trim();
+
                 deadLoopEvents.Insert(0, new DeadLoopEvent
                 {
                     Time = DateTime.Now,
@@ -234,8 +248,8 @@ public class ActionSystemDebuggerWindow : EditorWindow
 
         EditorGUILayout.BeginHorizontal();
 
-        DrawLeftPanel();   // subscribers
-        DrawRightPanel();  // call stack & deadloop log
+        DrawLeftPanel(); // subscribers
+        DrawRightPanel(); // call stack & deadloop log
 
         EditorGUILayout.EndHorizontal();
 
@@ -342,7 +356,7 @@ public class ActionSystemDebuggerWindow : EditorWindow
         }
         if (GUILayout.Button("Unsub All", GUILayout.Width(72)))
         {
-            if (EditorUtility.DisplayDialog("Unsubscribe", $"Remove all subscribers for {t.Name} ({timing})?", "Yes", "No"))
+            if (EditorUtility.DisplayDialog("Unsubscribe", $"OnRemove all subscribers for {t.Name} ({timing})?", "Yes", "No"))
             {
                 // attempt to remove by invoking unsubscribe with each delegate (best-effort)
                 try

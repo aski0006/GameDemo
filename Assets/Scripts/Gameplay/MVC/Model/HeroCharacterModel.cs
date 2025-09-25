@@ -5,9 +5,16 @@ namespace Gameplay.MVC.Model
 {
     public class HeroCharacterModel : CombatantModel, IHeroCombatant
     {
+        public HeroCharacterModel() { } // 允许创建空的模型，后续再绑定数据
+        
+        public HeroCharacterModel(HeroCharacterData data) 
+        {
+            BindData(data);
+        }
 
-        public HeroCharacterModel(HeroCharacterData data) : base(data, CombatantType.Hero)
-        { }
-
+        public void BindData(HeroCharacterData data)
+        {
+            base.BindData(data, CombatantType.Hero);
+        }
     }
 }

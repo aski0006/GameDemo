@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 namespace AsakiFramework
@@ -18,8 +19,19 @@ namespace AsakiFramework
         private readonly Dictionary<Type, HashSet<Action<GameAction>>> _preSet = new();
         private readonly Dictionary<Type, HashSet<Action<GameAction>>> _postSet = new();
 
-        /* ========== 调用栈防死循环 ========== */
-        private readonly HashSet<Type> _callStack = new();
+        /* ========== 调用栈防死循环：按 ActionGuid 检测 ========== */
+        // 用 Guid 集合加有序列表保存进入 Flow 的动作标识（稳定于动作类型）
+        private readonly HashSet<Guid> _callStackGuid = new();
+        private readonly List<(Guid guid, Type type)> _callStackList = new();
+
+        /* ========== 最大链式深度（超过则中断该 Flow） ========== */
+        // 可按需暴露为属性或 inspector 可调值，这里默认 200
+        private int _maxFlowDepth = 200;
+        public int MaxFlowDepth
+        {
+            get => _maxFlowDepth;
+            set => _maxFlowDepth = Math.Max(1, value);
+        }
 
         /* ========== 调试 & 性能 ========== */
         private int _runningCount;
@@ -95,6 +107,8 @@ namespace AsakiFramework
             _postSubs.Clear();
             _postSet.Clear();
             _perfSubs.Clear();
+            _callStackGuid.Clear();
+            _callStackList.Clear();
         }
         private static void AddUnique<T>(Action<T> cb,
             Dictionary<Type, List<Action<GameAction>>> dic,
@@ -118,7 +132,7 @@ namespace AsakiFramework
             var t = typeof(T);
             if (!dic.TryGetValue(t, out var list)) return;
 
-            // 创建与 Add 时完全相同的包装委托
+            // 创建与 OnAdd 时完全相同的包装委托
             Action<GameAction> wrapped = a => cb((T)a);
 
             if (set[t].Remove(wrapped)) list.Remove(wrapped);
@@ -155,11 +169,49 @@ namespace AsakiFramework
 
         private IEnumerator Flow(GameAction action, Action onFinish)
         {
-            if (!_callStack.Add(action.GetType()))
+            if (action == null)
             {
-                Debug.LogError($"[ActionSystem] 死循环反应：{action.GetType().Name}");
                 yield break;
             }
+
+            var guid = action.ActionGuid;
+            var type = action.GetType();
+
+            // 检查最大链深（guard）：如果当前已达到限制则中断并丢弃后续反应
+            if (_callStackList.Count >= _maxFlowDepth)
+            {
+                string msg = $"[ActionSystem] 超过最大链式深度 {_maxFlowDepth}，中断动作：{type.Name}";
+                Debug.LogError(msg);
+                yield break;
+            }
+
+            // try push to call stack guided by GUID (稳定于动作类型)
+            if (!_callStackGuid.Add(guid))
+            {
+                // 已存在，构建并打印出完整的调用链与环路信息，便于调试
+                int loopStart = _callStackList.FindIndex(p => p.guid == guid);
+                string fullStack = _callStackList.Count > 0 ? string.Join(" -> ", _callStackList.ConvertAll(p => p.type.Name)) : "<empty>";
+                string cycle;
+                if (loopStart >= 0)
+                {
+                    var cycleParts = _callStackList.GetRange(loopStart, _callStackList.Count - loopStart)
+                        .Select(p => p.type.Name).ToList();
+                    cycleParts.Add(type.Name); // 闭环回到当前类型实例的类型名
+                    cycle = string.Join(" -> ", cycleParts);
+                }
+                else
+                {
+                    cycle = string.Join(" -> ", _callStackList.ConvertAll(p => p.type.Name)) + " -> " + type.Name;
+                }
+
+                string msg = $"[ActionSystem] 死循环反应 (GUID)：{type.Name} ({guid})\nFull call chain: {fullStack}\nDetected cycle: {cycle}\nStackTrace:\n{Environment.StackTrace}";
+                Debug.LogError(msg);
+                yield break;
+            }
+
+            // push ordered tuple
+            _callStackList.Add((guid, type));
+
             _runningCount++;
             /* ------ Pre ------ */
             InvokeList(action, _preSubs);
@@ -171,7 +223,13 @@ namespace AsakiFramework
             InvokeList(action, _postSubs);
             yield return DoReactions(action.PostReactions);
 
-            _callStack.Remove(action.GetType());
+            // pop from call stack (ordered & set)
+            _callStackGuid.Remove(guid);
+            if (_callStackList.Count > 0 && _callStackList[_callStackList.Count - 1].guid == guid)
+                _callStackList.RemoveAt(_callStackList.Count - 1);
+            else
+                _callStackList.RemoveAll(x => x.guid == guid); // 保底移除
+
             _runningCount--;
             onFinish?.Invoke();
         }

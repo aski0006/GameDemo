@@ -40,10 +40,8 @@ public class QuickLayoutTool : EditorWindow
     void OnGUI()
     {
         so.Update();
-        EditorGUI.BeginChangeCheck();
 
         mode = (LayoutMode)EditorGUILayout.EnumPopup("Layout", mode);
-        EditorGUILayout.PropertyField(propTargets, true);
         spacing = EditorGUILayout.Vector3Field("Spacing", spacing);
 
         if (mode == LayoutMode.Grid)
@@ -51,10 +49,24 @@ public class QuickLayoutTool : EditorWindow
 
         showGizmo = GUILayout.Toggle(showGizmo, "Show Preview");
 
-        if (EditorGUI.EndChangeCheck())
+        // 自定义拖拽区域
+        GUILayout.Space(10);
+        GUILayout.Label("拖拽场景中的物体到下方：");
+        Rect dropRect = GUILayoutUtility.GetRect(0, 50, GUILayout.ExpandWidth(true));
+        GUI.Box(dropRect, "拖放 Hierarchy 中的 Transform 到这里");
+        HandleDragAndDrop(dropRect);
+
+        // 显示当前列表
+        for (int i = 0; i < targets.Count; i++)
         {
-            so.ApplyModifiedProperties();
-            RecalculatePreview();
+            GUILayout.BeginHorizontal();
+            targets[i] = (Transform)EditorGUILayout.ObjectField(targets[i], typeof(Transform), true);
+            if (GUILayout.Button("×", GUILayout.Width(20)))
+            {
+                targets.RemoveAt(i);
+                RecalculatePreview();
+            }
+            GUILayout.EndHorizontal();
         }
 
         GUILayout.Space(10);
@@ -68,6 +80,35 @@ public class QuickLayoutTool : EditorWindow
         {
             targets.Clear();
             RecalculatePreview();
+        }
+
+        so.ApplyModifiedProperties();
+    }
+    
+    void HandleDragAndDrop(Rect rect)
+    {
+        Event evt = Event.current;
+
+        if (!rect.Contains(evt.mousePosition)) return;
+
+        switch (evt.type)
+        {
+            case EventType.DragUpdated:
+                bool valid = DragAndDrop.objectReferences.All(o => o is Transform);
+                DragAndDrop.visualMode = valid ? DragAndDropVisualMode.Copy : DragAndDropVisualMode.Rejected;
+                evt.Use();
+                break;
+
+            case EventType.DragPerform:
+                DragAndDrop.AcceptDrag();
+                foreach (var obj in DragAndDrop.objectReferences)
+                {
+                    if (obj is Transform t && !targets.Contains(t))
+                        targets.Add(t);
+                }
+                RecalculatePreview();
+                evt.Use();
+                break;
         }
     }
 

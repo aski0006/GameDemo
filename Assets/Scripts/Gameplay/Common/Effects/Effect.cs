@@ -10,6 +10,9 @@ namespace Gameplay.Effects
     [Serializable]
     public abstract class Effect
     {
-        public abstract GameAction GetGameAction(List<CombatantBaseController> targets);
+        // 新增：告知这个 Effect 会产生哪种具体的 GameAction 类型，默认退化为 GameAction
+        public virtual Type ActionType => typeof(GameAction);
+
+        public abstract GameAction GetGameAction(List<CombatantBaseController> targets, CombatantBaseController caster = null);
     }
 }

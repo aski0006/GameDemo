@@ -40,7 +40,7 @@ namespace MStudio
                     //Check if the name of each gameObject is begin with keyChar in colorDesigns list.
                     if (instance.name.StartsWith(design.keyChar))
                     {
-                        //Remove the symbol(keyChar) from the name.
+                        //OnRemove the symbol(keyChar) from the name.
                         string newName = instance.name.Substring(design.keyChar.Length);
                         //Draw a rectangle as a background, and set the color.
                         EditorGUI.DrawRect(selectionRect, design.backgroundColor);
