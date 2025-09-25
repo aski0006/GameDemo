@@ -206,7 +206,7 @@ public class ActionSystemDebuggerWindow : EditorWindow
         {
             if (!string.IsNullOrEmpty(condition) && condition.Contains("[ActionSystem] 死循环反应"))
             {
-                // try to extract type name from message e.g. "[ActionSystem] 死循环反应：DealDamageGA"
+                // try to extract type name from message e.g. "[ActionSystem] 死循环反应：InjuryWithoutSourceGA"
                 string extracted = "";
                 var idx = condition.IndexOf("：");
                 if (idx >= 0 && idx < condition.Length - 1)

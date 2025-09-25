@@ -8,8 +8,9 @@ namespace Gameplay.Effects
     /// 抽象效果类
     /// </summary>
     [Serializable]
-    public abstract class Effect
+    public abstract class Effect 
     {
-        public abstract GameAction GetGameAction(List<CombatantBaseController> targets);
+        // 将 caster 作为可选参数传入，子类可以决定是否使用它
+        public abstract GameAction GetGameAction(List<CombatantBaseController> targets, CombatantBaseController caster = null);
     }
 }

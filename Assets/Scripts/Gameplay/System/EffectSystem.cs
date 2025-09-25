@@ -18,8 +18,8 @@ namespace Gameplay.System
 
         private IEnumerator PerformEffectPerformer(PerformEffectGA performEffectGA)
         {
-            // 执行效果
-            GameAction gameAction = performEffectGA.Effect.GetGameAction(performEffectGA.Targets);
+            // 将 caster 传给 Effect，以便返回的 GameAction（若实现了 IHasCaster）能携带施法者信息
+            GameAction gameAction = performEffectGA.Effect.GetGameAction(performEffectGA.Targets, performEffectGA.Caster);
             if (gameAction == null) yield break;
             performEffectGA.AddPerformReaction(gameAction);
             yield return null;

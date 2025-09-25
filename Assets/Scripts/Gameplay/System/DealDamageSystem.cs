@@ -1,4 +1,5 @@
 ﻿// DealDamageSystem.cs (简化版)
+
 using AsakiFramework;
 using Gameplay.Events;
 using Gameplay.GA;
@@ -18,20 +19,22 @@ namespace Gameplay.System
 
         private void OnEnable()
         {
-            ActionSystem.Instance.AttachPerformer<DealDamageGA>(DealDamagePerformer);
+            ActionSystem.Instance.AttachPerformer<InjuryWithoutSourceGA>(InjuryWithoutSourcePerformer);
+            ActionSystem.Instance.AttachPerformer<InjuryHasSourceGA>(InjuryHasSourcePerformer);
         }
 
         private void OnDisable()
         {
             if (ActionSystem.Instance == null) return;
-            ActionSystem.Instance.DetachPerformer<DealDamageGA>();
+            ActionSystem.Instance.DetachPerformer<InjuryWithoutSourceGA>();
+            ActionSystem.Instance.DetachPerformer<InjuryHasSourceGA>();
         }
 
-        private IEnumerator DealDamagePerformer(DealDamageGA action)
+        private IEnumerator InjuryWithoutSourcePerformer(InjuryWithoutSourceGA action)
         {
             if (action == null || action.Targets == null)
             {
-                LogWarning("DealDamageGA 或 Targets 为 null，跳过造成伤害流程。");
+                LogWarning("InjuryWithoutSourceGA 或 Targets 为 null，跳过造成伤害流程。");
                 yield break;
             }
 
@@ -39,16 +42,22 @@ namespace Gameplay.System
             {
                 if (target == null) continue;
 
-                CombatantViewBase targetView = target.GetView<CombatantViewBase>();
-                try
-                {
-                    target.TakeDamage(action.DamageAmount);
-                }
-                catch (Exception ex)
-                {
-                    LogError($"对目标造成伤害时出错：{ex}");
-                }
+                target.TakeDamage(action.DamageAmount);
+                yield return new WaitForSeconds(betweenTargetDelay);
+            }
+        }
 
+        private IEnumerator InjuryHasSourcePerformer(InjuryHasSourceGA action)
+        {
+            if (action == null || action.Targets == null)
+            {
+                LogWarning("InjuryHasSourceGA 或 Targets 为 null，跳过造成伤害流程。");
+                yield break;
+            }
+            foreach (CombatantBaseController target in action.Targets)
+            {
+                if (target == null) continue;
+                target.TakeDamage(action.DamageAmount);
                 yield return new WaitForSeconds(betweenTargetDelay);
             }
         }
